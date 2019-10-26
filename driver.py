@@ -1,6 +1,6 @@
 ###########################################################################
 ###########################################################################
-# Authors: Adrien Forkum, Nick Quinn, Karl
+# Authors: Adrien Forkum, Nick Quinn, Karl Horlitz
 # Date: 10/26/19
 #
 # Description: This file is the start point for the entire program and contains
@@ -13,15 +13,17 @@
 ###########################################################################
 
 # Library Imports ** UNCOMMENT WHEN OTHER FILES ARE READY **
-# from agents import *
-# from algorithms import *
-# from interface import *
-# from maps import *
+from agents import *
+from algorithms import *
+from interface import *
+from maps import *
 
 def main():
     print("Hello World")
-
-
+    interface_foo()
+    map_foo()
+    algorithms_foo()
+    agents_foo()
 
 
 main()
