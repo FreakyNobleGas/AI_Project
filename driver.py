@@ -12,15 +12,18 @@
 ###########################################################################
 ###########################################################################
 
-# Library Imports ** UNCOMMENT WHEN OTHER FILES ARE READY **
+# Library Imports
 from agents import *
 from algorithms import *
 from interface import *
 from maps import *
 
+
+
 def main():
-    print("Hello World")
-    interface_foo()
+    print("BEGIN MAIN")
+    #interface_foo()
+    window = mainWindow()
     map_foo()
     algorithms_foo()
     agents_foo()
