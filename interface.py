@@ -19,6 +19,7 @@ class mainWindow(QMainWindow):
 
     def __init__(self):
         app = QApplication([])
+        app.setGeometry(100,100,200,50)
         label = QLabel('Multi-Agent Freeze Tag')
         label.show()
         app.exec_()

@@ -22,7 +22,6 @@ from maps import *
 
 def main():
     print("BEGIN MAIN")
-    #interface_foo()
     window = mainWindow()
     map_foo()
     algorithms_foo()
