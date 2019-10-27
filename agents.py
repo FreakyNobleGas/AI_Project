@@ -11,3 +11,13 @@
 
 def agents_foo():
     print("In Agents Foo")
+    
+class Hunter:
+	def __init__(_current_pos=None, _image=None):
+		current_pos = _current_pos
+		image = _image
+
+class Runner:
+	def __init__(_current_pos=None, _image=None):
+		current_pos = _current_pos
+		image = _image
