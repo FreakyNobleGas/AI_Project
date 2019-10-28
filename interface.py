@@ -54,6 +54,15 @@ class mainWindow(QMainWindow):
 
     def newGame(self):
         print("TODO: Add code for new game!")
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText("TODO: Add code for new game!")
+        msg.exec()
+
 
     def help(self):
         print("TODO: Add code for help functionality")
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText("TODO: Add code for help functionality")
+        msg.exec()
