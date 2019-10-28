@@ -10,26 +10,50 @@
 ###########################################################################
 
 # Library Imports
-from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
-from PyQt5.QtWidgets import QLabel, QVBoxLayout, QPushButton, QWidget
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal
-from PyQt5.QtGui import QPainter, QColor
-
+import sys
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 class mainWindow(QMainWindow):
 
     def __init__(self):
+        # Required to start application
         app = QApplication([])
-        window = QWidget()
-        layout = QVBoxLayout()
-        layout.addWidget(QPushButton('Top'))
-        layout.addWidget(QPushButton('Bottom'))
-        window.setLayout(layout)
-        window.show()
-        #label = QLabel('Multi-Agent Freeze Tag')
-        #label.show()
+
+        # Creates a proxy object of the mainWindow class so that we can call
+        # methods that we define below.
+        super(mainWindow, self).__init__()
+
+        # initial x, inital y, x dimension, y dimension
+        self.setGeometry(100, 100, 800, 600)
+        self.setWindowTitle("Multi-Agent Freeze-Tag")
+
+        # Set program icon
+        self.setWindowIcon(QIcon('images/predator-icon.png'))
+        self.createButtons()
+        self.show()
         app.exec_()
 
-        #super().__init__()
+    def createButtons(self):
 
-        #self.createUI()
+        NewGameButton = QPushButton("New Game", self)
+        NewGameButton.clicked.connect(self.newGame)
+        NewGameButton.resize(600, 100)
+        NewGameButton.move(100, 100)
+
+        HelpButton = QPushButton("Help", self)
+        HelpButton.clicked.connect(self.help)
+        HelpButton.resize(600, 100)
+        HelpButton.move(100, 250)
+
+        QuitButton = QPushButton("Quit", self)
+        QuitButton.clicked.connect(QCoreApplication.instance().quit)
+        QuitButton.resize(600,100)
+        QuitButton.move(100, 400)
+
+    def newGame(self):
+        print("TODO: Add code for new game!")
+
+    def help(self):
+        print("TODO: Add code for help functionality")
