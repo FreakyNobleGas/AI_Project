@@ -31,11 +31,25 @@ class mainWindow(QMainWindow):
 
         # Set program icon
         self.setWindowIcon(QIcon('images/predator-icon.png'))
-        self.createButtons()
+
+        self.mainMenu = QVBoxLayout()
+        self.mainMenu = self.createButtons(self.mainMenu)
+
+        self.newGame = QVBoxLayout()
+
+        QuitButton = QPushButton("Quit", self)
+        QuitButton.clicked.connect(QCoreApplication.instance().quit)
+        QuitButton.resize(600,100)
+        QuitButton.move(100, 400)
+        self.newGame.addWidget(QuitButton)
+
+
+
+
         self.show()
         app.exec_()
 
-    def createButtons(self):
+    def createButtons(self, tempLayout):
 
         NewGameButton = QPushButton("New Game", self)
         NewGameButton.clicked.connect(self.newGame)
@@ -51,6 +65,12 @@ class mainWindow(QMainWindow):
         QuitButton.clicked.connect(QCoreApplication.instance().quit)
         QuitButton.resize(600,100)
         QuitButton.move(100, 400)
+
+        tempLayout.addWidget(NewGameButton)
+        tempLayout.addWidget(HelpButton)
+        tempLayout.addWidget(QuitButton)
+
+        return tempLayout
 
     def newGame(self):
         print("TODO: Add code for new game!")
