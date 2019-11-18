@@ -13,19 +13,18 @@
 ###########################################################################
 
 # Library Imports
-from agents import *
-from algorithms import *
 from interface import *
-from maps import *
 
+class Driver:
+    def __init__(self):
+        self.map = None
+        self.agents = []
+        self.algorithm = None
+        self.driver_window()
+        
+    def driver_window(self):
+        print("BEGIN MAIN")
+        window = mainWindow()
 
-
-def main():
-    print("BEGIN MAIN")
-    window = mainWindow()
-    map_foo()
-    algorithms_foo()
-    agents_foo()
-
-
-main()
+if __name__ == "__main__":
+    run_driver = Driver()

@@ -14,6 +14,9 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from agents import *
+from algorithms import *
+from maps import *
 
 class mainWindow(QMainWindow):
 
@@ -43,9 +46,6 @@ class mainWindow(QMainWindow):
         QuitButton.move(100, 400)
         self.newGame.addWidget(QuitButton)
 
-
-
-
         self.show()
         app.exec_()
 
@@ -71,9 +71,31 @@ class mainWindow(QMainWindow):
         tempLayout.addWidget(QuitButton)
 
         return tempLayout
+        
+    def newGameButtons(self, layout):
+        SetMapButton = QPushButton(self, "Choose Map")
+        SetMapButton.clicked.connect(self.mapSelect)
+        SetMapButton.resize(600, 100)
+        SetMapButton.move(100, 100)
+        
+        SetAgentsButton = QPushButton(self, "Set Agent Settings")
+        SetAgentsButton.clicked.connect(self.mapSelect)
+        SetAgentsButton.resize(600, 100)
+        SetAgentsButton.move(100, 250)
+        
+        SetAlgorithmButton = QPushButton(self, "Select Algorithm")
+        SetAlgorithmButton.clicked.connect(self.mapSelect)
+        SetAlgorithmButton.resize(600, 100)
+        SetAlgorithmButton.move(100, 400)
 
     def newGame(self):
         print("TODO: Add code for new game!")
+        gen_map = Map() 
+        gen_map.map_foo()
+        algorithms_foo()
+        agents_foo()
+        self.newGameMenu = QVBoxLayout()
+        self.newGameMenu = self.newGameButtons(self.newGameMenu)
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
         msg.setText("TODO: Add code for new game!")
@@ -86,3 +108,6 @@ class mainWindow(QMainWindow):
         msg.setIcon(QMessageBox.Information)
         msg.setText("TODO: Add code for help functionality")
         msg.exec()
+    
+    def mapSelect(self):
+        pass
