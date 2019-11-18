@@ -8,6 +8,12 @@
 # Map Details:
 #		Top left '=' is 0,0 in (x,y) coords.
 #
+# Map Key:
+#		(.) is a blank space.
+#		(|) and (-) are vertical and horizontal walls respectively.
+#		(S) is a safe zone space.
+#		(=) is a map boundry wall.
+#
 ###########################################################################
 ###########################################################################
 

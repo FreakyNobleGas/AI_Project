@@ -16,6 +16,9 @@
 from interface import *
 
 class Driver:
+    """
+    Class that is used to run the program and contains all the game elements.
+    """
     def __init__(self):
         self.map = None
         self.agents = []

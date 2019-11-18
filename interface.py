@@ -71,31 +71,12 @@ class mainWindow(QMainWindow):
         tempLayout.addWidget(QuitButton)
 
         return tempLayout
-        
-    def newGameButtons(self, layout):
-        SetMapButton = QPushButton(self, "Choose Map")
-        SetMapButton.clicked.connect(self.mapSelect)
-        SetMapButton.resize(600, 100)
-        SetMapButton.move(100, 100)
-        
-        SetAgentsButton = QPushButton(self, "Set Agent Settings")
-        SetAgentsButton.clicked.connect(self.mapSelect)
-        SetAgentsButton.resize(600, 100)
-        SetAgentsButton.move(100, 250)
-        
-        SetAlgorithmButton = QPushButton(self, "Select Algorithm")
-        SetAlgorithmButton.clicked.connect(self.mapSelect)
-        SetAlgorithmButton.resize(600, 100)
-        SetAlgorithmButton.move(100, 400)
 
     def newGame(self):
         print("TODO: Add code for new game!")
-        gen_map = Map() 
-        gen_map.map_foo()
+        new_game = NewGameSettings(self)
         algorithms_foo()
         agents_foo()
-        self.newGameMenu = QVBoxLayout()
-        self.newGameMenu = self.newGameButtons(self.newGameMenu)
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
         msg.setText("TODO: Add code for new game!")
@@ -109,5 +90,52 @@ class mainWindow(QMainWindow):
         msg.setText("TODO: Add code for help functionality")
         msg.exec()
     
+class NewGameSettings(QMainWindow):
+    def __init__(self, parent=None):
+        super(NewGameSettings, self).__init__(parent)
+        self.left = 100
+        self.right = 100
+        self.width = 800
+        self.height = 600
+        self.title = 'New Game'
+        self.initUi()
+        
+    def initUi(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.right, self.width, self.height)
+        self.menu = QVBoxLayout()
+        self.menu = self.newGameButtons(self.menu)
+        self.show()
+        
+    def newGameButtons(self, layout):
+        SetMapButton = QPushButton("Choose Map", self)
+        SetMapButton.clicked.connect(self.mapSelect)
+        SetMapButton.resize(600, 100)
+        SetMapButton.move(100, 100)
+        
+        SetAgentsButton = QPushButton("Set Agent Settings", self)
+        SetAgentsButton.clicked.connect(self.agentSelect)
+        SetAgentsButton.resize(600, 100)
+        SetAgentsButton.move(100, 250)
+        
+        SetAlgorithmButton = QPushButton("Select Algorithm", self)
+        SetAlgorithmButton.clicked.connect(self.algSelect)
+        SetAlgorithmButton.resize(600, 100)
+        SetAlgorithmButton.move(100, 400)
+        
+        layout.addWidget(SetMapButton)
+        layout.addWidget(SetAgentsButton)
+        layout.addWidget(SetAlgorithmButton)
+    
     def mapSelect(self):
-        pass
+        print("Map select")
+        gen_map = Map() 
+        gen_map.map_foo()
+        
+    def agentSelect(self):
+        print("Agent select")
+        
+    
+    def algSelect(self):
+        print("Algorithm select")
+

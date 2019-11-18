@@ -10,6 +10,12 @@
 ###########################################################################
 
 class Map():
+	"""
+	"Description: Object that cointains the file name of the map and the
+	"             x,y coordinates of map assets i.e. walls, map boundry.
+	"
+	"Input: String that is the name of map file.
+	"""
 	def __init__(self, map_name=None):
 		self.safe_zone = []
 		self.walls = []
@@ -21,11 +27,23 @@ class Map():
 		print("In Map Foo")
 		
 	def get_map_assets(self, map_name):
+		"""
+		"Description: Takes a map name to retrieve the map assets from 
+		"             a file and attain x,y coordinates for those assets.
+		"
+		"Input: String that is the map file name.
+		"
+		"Output: None
+		"""
+		
+		# Take the given file name and return the file
 		if map_name is None:
 			path = 'maps/default.txt'
 		else:
 			path = "maps/" + map_name
 		game_map = open(path, 'r')
+		
+		# Loop through opened map file to parse the x,y coordinates
 		y_coord = 0
 		for line in game_map.readlines():
 			x_coord = 0
@@ -43,3 +61,5 @@ class Map():
 				x_coord += 1
 			if not h_flag:
 				y_coord += 1
+		
+		game_map.close()
