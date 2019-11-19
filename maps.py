@@ -40,7 +40,7 @@ class Map():
 		if map_name is None:
 			path = 'maps/default.txt'
 		else:
-			path = "maps/" + map_name
+			path = map_name
 		game_map = open(path, 'r')
 		
 		# Loop through opened map file to parse the x,y coordinates

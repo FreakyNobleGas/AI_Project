@@ -73,14 +73,8 @@ class mainWindow(QMainWindow):
         return tempLayout
 
     def newGame(self):
-        print("TODO: Add code for new game!")
         new_game = NewGameSettings(self)
-        algorithms_foo()
-        agents_foo()
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information)
-        msg.setText("TODO: Add code for new game!")
-        msg.exec()
+        
 
 
     def help(self):
@@ -88,9 +82,10 @@ class mainWindow(QMainWindow):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
         msg.setText("TODO: Add code for help functionality")
-        msg.exec()
+        msg.exec_()
     
 class NewGameSettings(QMainWindow):
+    
     def __init__(self, parent=None):
         super(NewGameSettings, self).__init__(parent)
         self.left = 100
@@ -108,29 +103,32 @@ class NewGameSettings(QMainWindow):
         self.show()
         
     def newGameButtons(self, layout):
-        SetMapButton = QPushButton("Choose Map", self)
-        SetMapButton.clicked.connect(self.mapSelect)
-        SetMapButton.resize(600, 100)
-        SetMapButton.move(100, 100)
+        self.SetMapButton = QPushButton("Choose Map", self)
+        self.SetMapButton.clicked.connect(self.mapSelect)
+        self.SetMapButton.resize(600, 100)
+        self.SetMapButton.move(100, 100)
         
-        SetAgentsButton = QPushButton("Set Agent Settings", self)
-        SetAgentsButton.clicked.connect(self.agentSelect)
-        SetAgentsButton.resize(600, 100)
-        SetAgentsButton.move(100, 250)
+        self.SetAgentsButton = QPushButton("Set Agent Settings", self)
+        self.SetAgentsButton.clicked.connect(self.agentSelect)
+        self.SetAgentsButton.resize(600, 100)
+        self.SetAgentsButton.move(100, 250)
         
-        SetAlgorithmButton = QPushButton("Select Algorithm", self)
-        SetAlgorithmButton.clicked.connect(self.algSelect)
-        SetAlgorithmButton.resize(600, 100)
-        SetAlgorithmButton.move(100, 400)
+        self.SetAlgorithmButton = QPushButton("Select Algorithm", self)
+        self.SetAlgorithmButton.clicked.connect(self.algSelect)
+        self.SetAlgorithmButton.resize(600, 100)
+        self.SetAlgorithmButton.move(100, 400)
         
-        layout.addWidget(SetMapButton)
-        layout.addWidget(SetAgentsButton)
-        layout.addWidget(SetAlgorithmButton)
+        layout.addWidget(self.SetMapButton)
+        layout.addWidget(self.SetAgentsButton)
+        layout.addWidget(self.SetAlgorithmButton)
     
     def mapSelect(self):
         print("Map select")
-        gen_map = Map() 
-        gen_map.map_foo()
+        sel_map = FileMenu()
+        map_title = sel_map.selected_file.split("/")
+        self.SetMapButton.setText(map_title[-1].replace('.txt',''))
+        gen_map = Map(sel_map.selected_file)
+        print("Map is: ", gen_map.map_name) 
         
     def agentSelect(self):
         print("Agent select")
@@ -138,4 +136,55 @@ class NewGameSettings(QMainWindow):
     
     def algSelect(self):
         print("Algorithm select")
-
+        
+class FileMenu(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.title = 'Select Map'
+        self.left = 10
+        self.top = 10
+        self.width = 640
+        self.height = 480
+        self.selected_file = ''
+        self.initUI()
+    
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        
+        self.openFileNameDialog()
+        
+        self.show()
+    
+    def openFileNameDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, 
+            "Map Select",
+            "",
+            "All Files (*);;Python Files (*.py)",
+            options=options)
+        if fileName:
+            self.selected_file = fileName
+    
+    def openFileNamesDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        files, _ = QFileDialog.getOpenFileName(self, 
+            "QFileDialog.getOpenFileNames()",
+            "",
+            "All Files (*);;Python Files (*.py)",
+            options=options)
+        if files:
+            print(files)
+            
+    def saveFileDialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, 
+            "QFileDialog.getSaveFileName()",
+            "",
+            "All Files (*);;Text Files (*.txt)",
+            options=options)
+        if fileName:
+            print(fileName)
