@@ -67,16 +67,25 @@ class gameEngine():
 
 		
 		gameOver = 0
+		updateGame = 1
 		while not gameOver:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					gameOver = 1
-			screen.fill((0,0,0)) #this clears the screen. 
-			agentGroup.update(screen) #runs agent.update() on each agent in group
-			#agents themselves should check for if tagged, etc
-			wallGroup.update(screen)
-			time.sleep(0.1)#to slow it down
-			pygame.display.flip()
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_ESCAPE:
+						gameOver = 1
+					if event.key ==  pygame.K_p:
+						updateGame = 0
+					if event.key == pygame.K_c:
+						updateGame = 1
+			if updateGame:
+				screen.fill((0,0,0)) #this clears the screen. 
+				agentGroup.update(screen) #runs agent.update() on each agent in group
+				#agents themselves should check for if tagged, etc
+				wallGroup.update(screen)
+				time.sleep(0.1)#to slow it down
+				pygame.display.flip()
 		
 		
 class testAgent(pygame.sprite.Sprite):
@@ -118,7 +127,7 @@ class testAgent(pygame.sprite.Sprite):
 	def algorithm(self):
 		if self.agentAlgorithm == None:
 			agentPos = self.agentPos
-			#random code
+			#random movement code
 			x = (random.randrange(0,3,1)-1)
 			y = (random.randrange(0,3,1)-1)
 			agentPos[0] += x
@@ -127,6 +136,7 @@ class testAgent(pygame.sprite.Sprite):
 				agentPos[0] -= x
 				agentPos[1] -= y
 				None
+			#print("Pos: ",agentPos)
 			self.agentPos = agentPos
 			#out of bounds collision.  real Agents should keep this from happening
 			#by not taking invalid moves offscreen
@@ -228,8 +238,8 @@ class wallTile(pygame.sprite.Sprite):
 if __name__ == "__main__":
 	agentList = []
 	wallList = []
-	tempWalls = tempGetMap()
-	for i in range(1,50):
+	tempWalls = tempGetMap("maps/complex.txt")
+	for i in range(1,20):
 		agentList.append(testAgent())
 	for i in tempWalls.getWalls():
 		#print(i)
