@@ -85,7 +85,6 @@ class mainWindow(QMainWindow):
         msg.exec_()
     
 class NewGameSettings(QMainWindow):
-    
     def __init__(self, parent=None):
         super(NewGameSettings, self).__init__(parent)
         self.left = 100
@@ -93,6 +92,9 @@ class NewGameSettings(QMainWindow):
         self.width = 800
         self.height = 600
         self.title = 'New Game'
+        self.s_map = None
+        self.s_agents = []
+        self.s_alg = None
         self.initUi()
         
     def initUi(self):
@@ -127,15 +129,72 @@ class NewGameSettings(QMainWindow):
         sel_map = FileMenu()
         map_title = sel_map.selected_file.split("/")
         self.SetMapButton.setText(map_title[-1].replace('.txt',''))
-        gen_map = Map(sel_map.selected_file)
+        self.gen_map = Map(sel_map.selected_file)
         print("Map is: ", gen_map.map_name) 
         
     def agentSelect(self):
         print("Agent select")
+        sel_agents = AgentSelect(self)
+        self.s_agents = sel_agents.agent_list
         
-    
     def algSelect(self):
         print("Algorithm select")
+        
+class AgentSelect(QMainWindow):
+    def __init__(self, parent=None):
+        super(AgentSelect, self).__init__(parent)
+        self.left = 100
+        self.right = 100
+        self.width = 800
+        self.height = 600
+        self.title = 'Select Agents'
+        self.agent_list = []
+        self.initUi()
+        
+    def initUi(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.right, self.width, self.height)
+        self.menu = QVBoxLayout()
+        self.menu = self.AgentButtons(self.menu)
+        self.show()
+        
+    def AgentButtons(self, layout):
+        HunterAgent = QPushButton("Add Hunter", self)
+        HunterAgent.clicked.connect(lambda: self.addAgent("Hunter"))
+        HunterAgent.resize(100, 100)
+        HunterAgent.move(100, 100)
+        
+        RunnerAgent = QPushButton("Add Runner", self)
+        RunnerAgent.clicked.connect(lambda: self.addAgent("Runner"))
+        RunnerAgent.resize(100, 100)
+        RunnerAgent.move(100, 250)
+        
+        self.HunterLabel = QLabel()
+        self.HunterLabel.setAlignment(Qt.AlignCenter)
+        self.HunterLabel.setText("0")
+        self.HunterLabel.move(400,100)
+        
+        self.RunnerLabel = QLabel()
+        self.RunnerLabel.setAlignment(Qt.AlignCenter)
+        self.RunnerLabel.setText("0")
+        self.RunnerLabel.move(400,250)
+        
+        layout.addWidget(self.HunterLabel, 0, 0)
+        layout.addWidget(self.RunnerLabel, 0, 0)
+        layout.addWidget(HunterAgent)
+        layout.addWidget(RunnerAgent)
+        
+        #agent_params = {"Hunter":lambda: self.addAgent("Hunter"), "Runner": lambda: self.addAgent("Runner")}
+        #agent_buttons = GenButtons(params=agent_params, layout=layout)
+        #for agent, func in agent_buttons.button_map.items():
+        #    print(agent,' ',func)
+        #    layout.addWidget(func)
+            
+    def addAgent(self, agent):
+        if agent is 'Hunter':
+            self.agent_list.append(Hunter())
+        elif agent is 'Runner':
+            self.agent_list.append(Runner())
         
 class FileMenu(QWidget):
     def __init__(self):
@@ -166,25 +225,31 @@ class FileMenu(QWidget):
             options=options)
         if fileName:
             self.selected_file = fileName
-    
-    def openFileNamesDialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        files, _ = QFileDialog.getOpenFileName(self, 
-            "QFileDialog.getOpenFileNames()",
-            "",
-            "All Files (*);;Python Files (*.py)",
-            options=options)
-        if files:
-            print(files)
             
-    def saveFileDialog(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self, 
-            "QFileDialog.getSaveFileName()",
-            "",
-            "All Files (*);;Text Files (*.txt)",
-            options=options)
-        if fileName:
-            print(fileName)
+class GenButtons(QWidget):
+    def __init__(self, params, parent=None, layout=None):
+        """
+        :input: Params is a dictionary containing key value pair of (button text : button function)
+        """
+        super(GenButtons, self).__init__(parent)
+        self.params = params
+        self.layout = layout
+        self.button_map = {}
+        self.createButtons()
+    
+    def createButtons(self):
+        button_space = 0
+        for name, func in self.params.items():
+            button = QPushButton(name, self)
+            button.clicked.connect(func)
+            button.resize(600,100)
+            button.move(100,100 + button_space)
+            self.layout.addWidget(button)
+            self.saveButton(button)
+            button_space += 150
+    
+    def saveButton(self, obj):
+        self.button_map[obj.text()] = obj
+        
+    def findButtonByText(self, text):
+        return self.button_map[text]
