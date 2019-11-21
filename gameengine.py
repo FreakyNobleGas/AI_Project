@@ -20,13 +20,15 @@ import time
 import os.path
 import pygame
 
-spriteR = 20
+sScale =.4
+spriteR = 20*sScale
 #sprite radius.  should be directly related to sprite/grid size
 #currently, all sprites are 40x40, so sR=20
 
+
 #gamewindow defines window size.  code dependent on window size
 #pulls the dimensions from this variable
-gameWindow = (1024,768)
+gameWindow = (1,1)
 #NOTE! This will need to likely be dynamic based on the size of the map
 #so this value should be overriden in gameEngine.__init__(), taking the
 #dimensions of the given map into account
@@ -37,7 +39,7 @@ class gameEngine():
 		wallGroup = pygame.sprite.Group()
 		maxX = 0
 		maxY = 0
-		gW = []
+		global gameWindow
 		for i in wallList:
 			wallGroup.add(i)
 			tempPos = i.getPos()
@@ -46,7 +48,8 @@ class gameEngine():
 			if tempPos[1] > maxY:
 				maxY = tempPos[1]
 
-		gameWindow = ((2*spriteR*(maxX+1)),(2*spriteR*(maxY+1)))
+		gameWindow = (int(2*spriteR*(maxX+1)),int(2*spriteR*(maxY+1)))
+		#gameWindow = ((maxX+1),(maxY+1))
 		screen = pygame.display.set_mode(gameWindow)
 		pygame.display.flip()
 		pygame.display.set_caption('Freeze Tag')
@@ -66,9 +69,8 @@ class gameEngine():
 			agentGroup.update(screen) #runs agent.update() on each agent in group
 			#agents themselves should check for if tagged, etc
 			wallGroup.update(screen)
-			time.sleep(0.1)#to slow it down
+			time.sleep(0.01)#to slow it down
 			pygame.display.flip()
-		
 		
 		
 class testAgent(pygame.sprite.Sprite):
@@ -82,7 +84,7 @@ class testAgent(pygame.sprite.Sprite):
 		self.hunter = 1
 		#we won't use this- ultimately will be pulling from agents.py
 		if self.agentPos == None:
-			self.agentPos = [random.randrange(0,gameWindow[0],1),random.randrange(0,gameWindow[1],1)]
+			self.agentPos = [random.randrange(40,gameWindow[0],40),random.randrange(40,gameWindow[1],40)]
 		self.rect = pygame.Rect(self.agentPos[0],self.agentPos[1], spriteR, spriteR)
 		if self.image == None:
 			if not random.randrange(0,5,1):
@@ -90,6 +92,7 @@ class testAgent(pygame.sprite.Sprite):
 				self.hunter = 0
 			else:
 				self.image = pygame.image.load('./images/predator-small.png')
+			self.image = pygame.transform.scale(self.image, (int(spriteR*2), int(spriteR*2)))
 
 		
 	def update(self,screen):
@@ -104,19 +107,21 @@ class testAgent(pygame.sprite.Sprite):
 		screen.blit(self.image,self.rect)
 		#screen.blit() is what actually draws the image to the screen.
 		#need to update the rect. with current coordinates before drawing
-		print("X: ",agentPos[0]," Y: ", agentPos[1])
+		#print("X: ",agentPos[0]," Y: ", agentPos[1])
 		
 		
 	def algorithm(self):
 		if self.agentAlgorithm == None:
 			agentPos = self.agentPos
-			#old random code
+			#random code
 			x = (random.randrange(0,3,1)-1)
 			y = (random.randrange(0,3,1)-1)
-			print("X: ",x," Y: ", y)
 			agentPos[0] += spriteR*x
 			agentPos[1] += spriteR*y
-			
+			if not self.validMove(wallList):#undo move if collides with a wall
+				agentPos[0] -= spriteR*x
+				agentPos[1] -= spriteR*y
+			self.agentPos = agentPos
 			#out of bounds collision.  real Agents should keep this from happening
 			#by not taking invalid moves offscreen
 			if agentPos[0] < 0:
@@ -130,6 +135,14 @@ class testAgent(pygame.sprite.Sprite):
 		else:
 			#use algorithm
 			None
+
+
+	def validMove(self,wallList):
+		for i in wallList:
+			if pygame.sprite.collide_rect(self,i):
+				return False
+		return True
+	
 	
 	def getposition(self):
 		return agentPos
@@ -181,15 +194,19 @@ class wallTile(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self)
 		self.thiscolor = (random.randrange(0,255,1),random.randrange(0,255,1),random.randrange(0,255,1))
 		self.image = pygame.image.load('./images/bricks-small.png')
+		self.image = pygame.transform.scale(self.image, (int(spriteR*2), int(spriteR*2)))
 		self.wallPos = _current_pos
+		self.rect = pygame.Rect(self.wallPos[0]*2*spriteR,self.wallPos[1]*2*spriteR, spriteR, spriteR)
+		
 		
 	def update(self,screen):
 		wallPos = self.wallPos
 		self.rect = pygame.Rect(self.wallPos[0]*2*spriteR,self.wallPos[1]*2*spriteR, spriteR, spriteR)
+		
 		screen.blit(self.image,self.rect)
 		#screen.blit() is what actually draws the image to the screen.
 		#need to update the rect. with current coordinates before drawing
-		print("Xw: ",wallPos[0]," Yw: ", wallPos[1])
+		#print("Xw: ",wallPos[0]," Yw: ", wallPos[1])
 	
 	def getPos(self):
 		return self.wallPos
@@ -199,14 +216,15 @@ class wallTile(pygame.sprite.Sprite):
 #loop should iterate each agent one step, then redraw screen
 #code below is a basic implementation
 
+
 if __name__ == "__main__":
 	agentList = []
 	wallList = []
 	tempWalls = tempGetMap()
-	for i in range(1,10):
+	for i in range(1,200):
 		agentList.append(testAgent())
 	for i in tempWalls.getWalls():
-		print(i)
+		#print(i)
 		wallList.append(wallTile(i))
 	gameEngine(agentList,wallList)
 		
