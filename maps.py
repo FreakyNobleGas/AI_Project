@@ -63,3 +63,12 @@ class Map():
 				y_coord += 1
 		
 		game_map.close()
+		
+	def get_walls(self):
+		return self.walls
+	
+	def get_map_bounds(self):
+		return self.map_bounds
+		
+	def get_safezone(self):
+		return self.safe_zone

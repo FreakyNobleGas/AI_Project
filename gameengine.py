@@ -61,11 +61,10 @@ class gameEngine():
 		pygame.display.set_caption('Freeze Tag')
 		
 		agentGroup = pygame.sprite.Group()
-		#agentsList is a list of agents, passed into agentGroup
+		# agentsList is a list of agents, passed into agentGroup
 		for i in agentsList:
 			agentGroup.add(i)
-
-		
+			
 		gameOver = 0
 		updateGame = 1
 		while not gameOver:
@@ -82,7 +81,8 @@ class gameEngine():
 			if updateGame:
 				screen.fill((0,0,0)) #this clears the screen. 
 				agentGroup.update(screen) #runs agent.update() on each agent in group
-				#agents themselves should check for if tagged, etc
+				
+				# agents themselves should check for if tagged, etc
 				wallGroup.update(screen)
 				time.sleep(0.1)#to slow it down
 				pygame.display.flip()

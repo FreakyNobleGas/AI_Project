@@ -13,7 +13,8 @@
 ###########################################################################
 
 # Library Imports
-from interface import *
+from interface import mainWindow
+from gameengine import gameEngine
 
 class Driver:
     """
@@ -33,6 +34,17 @@ class Driver:
         print (window.c_map)
         print (window.c_agent)
         print (window.c_alg)
+        self.run_game(window.c_map, window.c_agent, window.c_alg)
+        
+    def run_game(self, c_map, c_agent, c_alg):
+        agentList = []
+        wallList = []
+        for agent, agent_list in c_agent.items():
+            agentList.extend(agent_list)
+        for i in c_map.get_walls():
+            wallList.append(wallTile(i))
+        gameEngine(agentList,wallList)
 
+        
 if __name__ == "__main__":
     run_driver = Driver()
