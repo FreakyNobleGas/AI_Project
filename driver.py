@@ -28,6 +28,9 @@ class Driver:
     def driver_window(self):
         print("BEGIN MAIN")
         window = mainWindow()
+        print (window.c_map)
+        print (window.c_agent)
+        print (window.c_alg)
 
 if __name__ == "__main__":
     run_driver = Driver()
