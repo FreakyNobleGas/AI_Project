@@ -21,9 +21,11 @@ from maps import *
 class mainWindow(QMainWindow):
 
     def __init__(self):
+        # Required to run game
         self.c_map = None
         self.c_agent = {}
         self.c_alg = None
+        self.new_game = None
         # Required to start application
         app = QApplication([])
 
@@ -77,11 +79,28 @@ class mainWindow(QMainWindow):
         self.new_game = NewGameSettings(self)
         
     def runGame(self):
-        self.c_map = self.new_game.s_map
-        self.c_agent['Hunter'] = self.new_game.hunter_list
-        self.c_agent['Runner'] = self.new_game.runner_list
-        self.c_alg = self.new_game.s_alg
-        self.close()
+        if not self.new_game:
+            print("New game not started")
+            return
+        elif not self.new_game.hunter_list:
+            print("No hunters, Check 1 ", self.new_game.hunter_list)
+            return
+        elif not self.new_game.runner_list:
+            print("No runners, Check 2")
+            return
+        elif self.new_game.s_alg is None:
+            print("No algorithm, Check 3")
+            return
+        elif self.new_game.s_map is None:
+            print("No map, Check 4")
+            return
+        else:
+            print("Game is ready!")
+            self.c_map = self.new_game.s_map
+            self.c_agent['Hunter'] = self.new_game.hunter_list
+            self.c_agent['Runner'] = self.new_game.runner_list
+            self.c_alg = self.new_game.s_alg
+            self.close()
 
     def help(self):
         print("TODO: Add code for help functionality")
@@ -145,9 +164,12 @@ class NewGameSettings(QMainWindow):
     def mapSelect(self):
         print("Map select")
         sel_map = FileMenu()
-        map_title = sel_map.selected_file.split("/")
-        self.SetMapButton.setText(map_title[-1].replace('.txt',''))
-        self.s_map = Map(sel_map.selected_file)
+        if sel_map.selected_file is not None:
+            map_title = sel_map.selected_file.split("/")
+            self.SetMapButton.setText(map_title[-1].replace('.txt',''))
+            self.s_map = Map(sel_map.selected_file)
+        else:
+            print("Map not selected: Add dailogbox to inform user", sel_map.selected_file)
         
     def agentSelect(self):
         print("Agent select")
@@ -158,20 +180,14 @@ class NewGameSettings(QMainWindow):
         self.sel_alg = AlgSelect(self.SetAlgorithmButton)
         
     def n_g_done(self):
-        self.s_alg = self.sel_alg.getAlg()
-        self.hunter_list = self.sel_agents.hunter_list
-        self.runner_list = self.sel_agents.runner_list
-        if not self.hunter_list:
-            print("No hunters, Check 1")
-        elif not self.hunter_list:
-            print("No runners, Check 2")
-        elif self.s_alg is None:
-            print("No algorithm, Check 3")
-        elif self.s_map is None:
-            print("No map, Check 4")
+        if not self.sel_alg.getAlg() or not self.sel_agents.hunter_list or not self.sel_agents.runner_list or not self.s_map:
+            print("Returned with no Values")
+            self.close()
         else:
-            print("All Objects Found")
-        self.close()
+            self.s_alg = self.sel_alg.getAlg()
+            self.hunter_list = self.sel_agents.hunter_list
+            self.runner_list = self.sel_agents.runner_list
+            self.close()
         
 class AgentSelect(QMainWindow):
     def __init__(self, parent=None):

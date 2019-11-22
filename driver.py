@@ -27,6 +27,8 @@ class Driver:
         
     def driver_window(self):
         print("BEGIN MAIN")
+        # mainWindow object contains c_map for map object , c_alg for algorithm object,
+        # and a dictionary {'Hunter':[hunter obj list], 'Runner':[runner obj list].
         window = mainWindow()
         print (window.c_map)
         print (window.c_agent)
