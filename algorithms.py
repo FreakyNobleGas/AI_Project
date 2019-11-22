@@ -9,13 +9,10 @@
 ###########################################################################
 ###########################################################################
 
-def algorithms_foo():
-    print("In Algorithm Foo")
-
 class DFS:
 	def __init__(self):
 		pass
-		
+
 class BFS:
 	def __init__(self):
 		pass
@@ -23,11 +20,11 @@ class BFS:
 class Astar:
 	def __init__(self):
 		pass
-		
+
 class MinMax:
 	def __init__(self):
 		pass
-		
+
 class ExpMax:
 	def __init__(self):
 		pass

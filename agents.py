@@ -9,17 +9,20 @@
 ###########################################################################
 ###########################################################################
 
-def agents_foo():
-    print("In Agents Foo")
-    
+import pygame
+
 class Hunter:
-	def __init__(_current_pos=None, _image=None, _algorithm=None):
-		current_pos = _current_pos
-		image = _image
-		algorithm = _algorithm
+	def __init__(self, _current_pos=None, _image=None, _image2=None, _algorithm=None):
+		self.current_pos = _current_pos
+		self.image = _image
+		self.image2 = _image2
+		self.algorithm = _algorithm
+		self.agentPos = _current_pos
 
 class Runner:
-	def __init__(_current_pos=None, _image=None, _algorithm=None):
-		current_pos = _current_pos
-		image = _image
-		algorithm = _algorithm
+	def __init__(self, _current_pos=None, _image=None, _image2=None, _algorithm=None):
+		self.current_pos = _current_pos
+		self.image = _image
+		self.image2 = _image2
+		self.algorithm = _algorithm
+		self.agentPos = _current_pos
