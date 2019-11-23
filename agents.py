@@ -13,7 +13,7 @@ import pygame
 import algorithms
 
 class agent(pygame.sprite.Sprite):
-	def __init__(self, c_map, c_agent_list, c_alg=None, _role=None,
+	def __init__(self, c_map, c_agent_list=None, c_alg=None, _role=None,
 				_current_pos=None, _image=None, _image2=None, _algorithm=None):
 
 		# Create Sprite Object for Agent
@@ -22,7 +22,8 @@ class agent(pygame.sprite.Sprite):
 		# Create Object Variables
 		self.agent_pos = _current_pos
 		self.c_map = c_map
-		self.c_agent_list = c_agent_list
+		# TODO: Need to discuss agent list.
+		self.c_agent_list = c_agent_list 
 		self.c_alg = c_alg
 		self.role = _role
 		self.image = _image

@@ -39,7 +39,7 @@ gameWindow = (100,100)
 
 class gameEngine():
 
-	def __init__(self,agentsList,wallList, c_map, c_agent=None, c_alg=None):
+	def __init__(self, agentsList, wallList, newMap, c_agent=None, c_alg=None):
 		self.wallList = wallList
 		wallGroup = pygame.sprite.Group()
 		maxX = 0

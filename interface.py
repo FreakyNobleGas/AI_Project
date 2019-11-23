@@ -23,7 +23,7 @@ class mainWindow(QMainWindow):
     def __init__(self):
         # Required to run game
         self.c_map = None
-        self.c_agent = {}
+        self.c_agents = {}
         self.c_alg = None
         self.new_game = None
         # Required to start application
@@ -82,11 +82,8 @@ class mainWindow(QMainWindow):
         if not self.new_game:
             print("New game not started")
             return
-        elif not self.new_game.hunter_list:
-            print("No hunters, Check 1 ", self.new_game.hunter_list)
-            return
-        elif not self.new_game.runner_list:
-            print("No runners, Check 2")
+        elif not self.new_game.agent_list:
+            print("No agents, Check 1 ")
             return
         elif self.new_game.s_alg is None:
             print("No algorithm, Check 3")
@@ -97,8 +94,7 @@ class mainWindow(QMainWindow):
         else:
             print("Game is ready!")
             self.c_map = self.new_game.s_map
-            self.c_agent['Hunter'] = self.new_game.hunter_list
-            self.c_agent['Runner'] = self.new_game.runner_list
+            self.c_agents = self.new_game.agent_list
             self.c_alg = self.new_game.s_alg
             self.close()
 
@@ -118,8 +114,7 @@ class NewGameSettings(QMainWindow):
         self.height = 600
         self.title = 'New Game'
         self.s_map = None
-        self.hunter_list = []
-        self.runner_list = []
+        self.agent_list = {}
         self.s_alg = None
         self.alg_text = ''
         self.initUi()
@@ -167,7 +162,7 @@ class NewGameSettings(QMainWindow):
         if sel_map.selected_file is not None:
             map_title = sel_map.selected_file.split("/")
             self.SetMapButton.setText(map_title[-1].replace('.txt',''))
-            self.s_map = Map(sel_map.selected_file)
+            self.s_map = sel_map.selected_file
         else:
             print("Map not selected: Add dailogbox to inform user", sel_map.selected_file)
         
@@ -180,13 +175,12 @@ class NewGameSettings(QMainWindow):
         self.sel_alg = AlgSelect(self.SetAlgorithmButton)
         
     def n_g_done(self):
-        if not self.sel_alg.getAlg() or not self.sel_agents.hunter_list or not self.sel_agents.runner_list or not self.s_map:
+        if not self.sel_alg.getAlg() or not self.sel_agents.getAgents() or not self.s_map:
             print("Returned with no Values")
             self.close()
         else:
             self.s_alg = self.sel_alg.getAlg()
-            self.hunter_list = self.sel_agents.hunter_list
-            self.runner_list = self.sel_agents.runner_list
+            self.agent_list = self.sel_agents.getAgents()
             self.close()
         
 class AgentSelect(QMainWindow):
@@ -197,8 +191,7 @@ class AgentSelect(QMainWindow):
         self.width = 800
         self.height = 600
         self.title = 'Select Agents'
-        self.hunter_list = []
-        self.runner_list = []
+        self.agent_dict = {'hunter':0, 'runner':0}
         self.initUi()
         
     def initUi(self):
@@ -210,22 +203,22 @@ class AgentSelect(QMainWindow):
         
     def AgentButtons(self, layout):
         self.AddHunter = QPushButton("Add Hunter", self)
-        self.AddHunter.clicked.connect(lambda: self.addAgent("Hunter"))
+        self.AddHunter.clicked.connect(lambda: self.addAgent("hunter"))
         self.AddHunter.resize(len("Add Hunter") * 10, 100)
         self.AddHunter.move(100, 100)
         
         self.AddRunner = QPushButton("Add Runner", self)
-        self.AddRunner.clicked.connect(lambda: self.addAgent("Runner"))
+        self.AddRunner.clicked.connect(lambda: self.addAgent("runner"))
         self.AddRunner.resize(len("Add Runner") * 10, 100)
         self.AddRunner.move(100, 250)
         
         self.DeleteHunter = QPushButton("Delete Hunter", self)
-        self.DeleteHunter.clicked.connect(lambda: self.delAgent("Hunter"))
+        self.DeleteHunter.clicked.connect(lambda: self.delAgent("hunter"))
         self.DeleteHunter.resize(len("Delete Hunter") * 10, 100)
         self.DeleteHunter.move(200, 100)
         
         self.DeleteRunner = QPushButton("Delete Runner", self)
-        self.DeleteRunner.clicked.connect(lambda: self.delAgent("Runner"))
+        self.DeleteRunner.clicked.connect(lambda: self.delAgent("runner"))
         self.DeleteRunner.resize(len("Delete Runner") * 10, 100)
         self.DeleteRunner.move(200, 250)
         
@@ -253,23 +246,32 @@ class AgentSelect(QMainWindow):
         layout.addWidget(self.RunnerLabel)
             
     def addAgent(self, agent):
-        if agent is 'Hunter':
-            self.hunter_list.append(Hunter())
-            self.HunterLabel.setText("Hunters: " + str(len(self.hunter_list)))
-        elif agent is 'Runner':
-            self.runner_list.append(Runner())
-            self.RunnerLabel.setText("Runners: " + str(len(self.runner_list)))
+        self.agent_dict[agent] += 1
+        self.HunterLabel.setText("Hunters: " + str(self.agent_dict['hunter']))
+        self.RunnerLabel.setText("Runners: " + str(self.agent_dict['runner']))
+        
+        #if agent is 'Hunter':
+        #    self.agent_list[agent]
+        #    self.HunterLabel.setText("Hunters: " + str(len(self.hunter_list)))
+        #elif agent is 'Runner':
+        #    self.runner_list.append(Runner())
+        #    self.RunnerLabel.setText("Runners: " + str(len(self.runner_list)))
             
     def delAgent(self, agent):
-        if agent is 'Hunter' and len(self.hunter_list) != 0:
-            self.hunter_list.pop(-1)
-            self.HunterLabel.setText("Hunters: " + str(len(self.hunter_list)))
-        elif agent is 'Runner' and len(self.runner_list) != 0:
-            self.runner_list.pop(-1)
-            self.RunnerLabel.setText("Runners: " + str(len(self.runner_list)))
+        if self.agent_dict[agent] is not 0:
+            self.agent_dict[agent] -= 1
+            self.HunterLabel.setText("Hunters: " + str(self.agent_dict['hunter']))
+            self.RunnerLabel.setText("Runners: " + str(self.agent_dict['runner']))
+        
+        #if agent is 'Hunter' and len(self.hunter_list) != 0:
+        #    self.hunter_list.pop(-1)
+        #    self.HunterLabel.setText("Hunters: " + str(len(self.hunter_list)))
+        #elif agent is 'Runner' and len(self.runner_list) != 0:
+        #    self.runner_list.pop(-1)
+        #    self.RunnerLabel.setText("Runners: " + str(len(self.runner_list)))
             
     def getAgents(self):
-        return self.hunter_list, self.runner_list
+        return self.agent_dict
         
 class FileMenu(QWidget):
     def __init__(self):
@@ -371,16 +373,8 @@ class AlgSelect(QMainWindow):
     
     def selectAlg(self, selected_alg):
         self.obj.setText(selected_alg)
-        if selected_alg == 'DFS':
-            self.alg = DFS()
-        elif selected_alg == 'BFS':
-            self.alg = BFS()
-        elif selected_alg == 'A*':
-            self.alg = Astar()
-        elif selected_alg == 'Min Max':
-            self.alg = MinMax()
-        elif selected_alg == 'Expected Max':
-            self.alg = ExpMax()
+        if selected_alg:
+            self.alg = selected_alg
         else:
             print("NO ALGORITHM")
             
