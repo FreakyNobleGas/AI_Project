@@ -182,7 +182,12 @@ if __name__ == "__main__":
 	c_agent = "hunter"
 	
 	for i in range(1,20):
-		agentList.append(agents.agent(gameWindow, c_map=c_map, c_agent=c_agent, c_alg = "random", _role = "hunter"))
+		r = random.randrange(0,5,1)
+		if r == 0:
+			_role = "runner"
+		else:
+			_role = "hunter"
+		agentList.append(agents.agent(gameWindow, c_map=c_map, c_agent=c_agent, c_alg = "random", _role = _role))
 	for i in tempWalls.getWalls():
 		#print(i)
 		wallList.append(wallTile(i))

@@ -35,7 +35,7 @@ class agent(pygame.sprite.Sprite):
 
 		# TODO: Add functionality for map to decide where agents start
 		if self.agent_pos == None:
-			self.agent_pos = [random.randrange(3,gameWindow[0]-3,1),random.randrange(3,gameWindow[1]-3,1)]
+			self.agent_pos = [5,5]#[random.randrange(5,gameWindow[0]-5,1),random.randrange(5,gameWindow[1]-5,1)]
 
 		# Create sprite image based on location and dimensions
 		self.rect = pygame.Rect(self.agent_pos[0],self.agent_pos[1], self.spriteR, self.spriteR)
@@ -56,9 +56,10 @@ class agent(pygame.sprite.Sprite):
 			self.algorithm = algorithms.genericAlgorithms(self.agent_pos, self.c_map)
 
 		# Assign Image
+		print("Role: ", self.role)
 		if self.role == "hunter":
 			self.image = pygame.image.load('./images/predator-small.png')
-		if self.role == "runner":
+		elif self.role == "runner":
 			self.image = pygame.image.load('./images/waldo-small.png')
 		else:
 			print("ERROR: AGENTS.PY - COULD NOT FIND IMAGE.")

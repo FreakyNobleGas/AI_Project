@@ -27,9 +27,9 @@ class genericAlgorithms:
 		self.agent_pos= ((self.agent_pos[0] + x), (self.agent_pos[1] + y))
 
 		# Undo move if collides with a wall
-		print("p: ", self.agent_pos, " : ",self.wallList)
+		#print("p: ", self.agent_pos, " : ",self.wallList)
 		if self.agent_pos in self.wallList:
-			print("Collsiion")
+			#print("Collsiion")
 			self.agent_pos= ((self.agent_pos[0] - x), (self.agent_pos[1] - y))
 
 		return self.agent_pos
