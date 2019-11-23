@@ -19,11 +19,11 @@ import random
 import time
 import os.path
 import pygame
-import agents 
+import agents
 
 
 sScale =.5
-spriteR = 20*sScale
+spriteR = 20 * sScale
 #sprite radius.  should be directly related to sprite/grid size
 #currently, all sprites are 40x40, so sR=20
 #this is a scaling factor only used for sprite movement and window scale
@@ -37,8 +37,8 @@ gameWindow = (100,100)
 #dimensions of the given map into account
 
 class gameEngine():
-	
-	def __init__(self,agentsList,wallList=None):
+
+	def __init__(self,agentsList,wallList=None, c_map, c_agent, c_alg):
 		self.wallList = wallList
 		wallGroup = pygame.sprite.Group()
 		maxX = 0
@@ -62,12 +62,12 @@ class gameEngine():
 		screen = pygame.display.set_mode(winsize)
 		pygame.display.flip()
 		pygame.display.set_caption('Freeze Tag')
-		
+
 		agentGroup = pygame.sprite.Group()
 		# agentsList is a list of agents, passed into agentGroup
 		for i in agentsList:
 			agentGroup.add(i)
-			
+
 		gameOver = 0
 		updateGame = 1
 		while not gameOver:
@@ -82,14 +82,14 @@ class gameEngine():
 					if event.key == pygame.K_c:
 						updateGame = 1
 			if updateGame:
-				screen.fill((0,0,0)) #this clears the screen. 
-				agentGroup.update(screen,gameWindow,wallList) #runs agent.update() on each agent in group
-				
+				screen.fill((0,0,0)) #this clears the screen.
+				agentGroup.update(screen) #runs agent.update() on each agent in group
+
 				# agents themselves should check for if tagged, etc
 				wallGroup.update(screen)
 				time.sleep(0.1)#to slow it down
 				pygame.display.flip()
-		
+
 	def validMove(self,agentPos):
 		#this function, in this case, only checks if the proposed move is
 		#inside a wall.  More advanced agents may use a more elaborate function
@@ -100,10 +100,10 @@ class gameEngine():
 				#print("Collision")
 				return False
 		return True
-		
+
 	def manhattanDistance():
 		None#Foo.
-		
+
 
 
 class tempGetMap():
@@ -119,7 +119,7 @@ class tempGetMap():
 		else:
 			path = map_name
 		game_map = open(path, 'r')
-		
+
 		# Loop through opened map file to parse the x,y coordinates
 		y_coord = 0
 		for line in game_map.readlines():
@@ -138,14 +138,14 @@ class tempGetMap():
 				x_coord += 1
 			if not h_flag:
 				y_coord += 1
-		
+
 		game_map.close()
-		
+
 	def getWalls(self):
 		return self.walls
 
 
-		
+
 class wallTile(pygame.sprite.Sprite):
 	def __init__(self,_current_pos):
 		pygame.sprite.Sprite.__init__(self)
@@ -154,21 +154,21 @@ class wallTile(pygame.sprite.Sprite):
 		self.image = pygame.transform.scale(self.image, (int(spriteR*2), int(spriteR*2)))
 		self.wallPos = _current_pos
 		self.rect = pygame.Rect(self.wallPos[0]*2*spriteR,self.wallPos[1]*2*spriteR, spriteR, spriteR)
-		
-		
+
+
 	def update(self,screen):
 		wallPos = self.wallPos
 		self.rect = pygame.Rect(self.wallPos[0]*2*spriteR,self.wallPos[1]*2*spriteR, spriteR, spriteR)
-		
+
 		screen.blit(self.image,self.rect)
 		#screen.blit() is what actually draws the image to the screen.
 		#need to update the rect. with current coordinates before drawing
 		#print("Xw: ",wallPos[0]," Yw: ", wallPos[1])
-	
+
 	def getPos(self):
 		return self.wallPos
-		
-		
+
+
 #on run, ultimately should loop until win/loss
 #loop should iterate each agent one step, then redraw screen
 #code below is a basic implementation
@@ -178,9 +178,8 @@ if __name__ == "__main__":
 	wallList = []
 	tempWalls = tempGetMap("maps/complex.txt")
 	for i in range(1,20):
-		agentList.append(agents.testAgent(gameWindow))
+		agentList.append(agents.testAgent(gameWindow, c_map=c_map, c_agent=c_agent, c_alg=c_alg))
 	for i in tempWalls.getWalls():
 		#print(i)
 		wallList.append(wallTile(i))
 	gameEngine(agentList,wallList)
-		

@@ -11,105 +11,74 @@
 import random
 import pygame
 
+class agent(pygame.sprite.Sprite):
+	def __init__(self, gameWindow,_current_pos=None, _image=None, _image2=None, _algorithm=None,
+				c_map, c_agent, c_alg, _role, _screen):
 
-
-sScale =.5
-spriteR = 20*sScale
-
-class Hunter:
-	def __init__(self, _current_pos=None, _image=None, _image2=None, _algorithm=None):
-		self.current_pos = _current_pos
-		self.image = _image
-		self.image2 = _image2
-		self.algorithm = _algorithm
-		self.agentPos = _current_pos
-
-class Runner:
-	def __init__(self, _current_pos=None, _image=None, _image2=None, _algorithm=None):
-		self.current_pos = _current_pos
-		self.image = _image
-		self.image2 = _image2
-		self.algorithm = _algorithm
-		self.agentPos = _current_pos
-
-
-
-class testAgent(pygame.sprite.Sprite):
-	def __init__(self,gameWindow,_current_pos=None, _image=None, _image2=None, _algorithm=None):
+		# Create Sprite Object for Agent
 		pygame.sprite.Sprite.__init__(self)
-		self.thiscolor = (random.randrange(0,255,1),random.randrange(0,255,1),random.randrange(0,255,1))
-		self.agentAlgorithm = _algorithm
+
+		# Create Object Variables
+		self.agent_pos = _current_pos
+		self.c_map = c_map
+		self.c_agent = c_agent
+		self.c_alg = c_alg
+		self.role = _role
 		self.image = _image
 		self.image2 = _image2
-		self.agentPos = _current_pos
-		self.hunter = 1
-		#self.wallList = wallList
-		#we won't use this- ultimately will be pulling from agents.py
-		if self.agentPos == None:
-			self.agentPos = [random.randrange(3,gameWindow[0]-3,1),random.randrange(3,gameWindow[1]-3,1)]
-		self.rect = pygame.Rect(self.agentPos[0],self.agentPos[1], spriteR, spriteR)
-		if self.image == None:
-			if not random.randrange(0,5,1):
-				self.image = pygame.image.load('./images/waldo-small.png')
-				self.hunter = 0
-			else:
-				self.image = pygame.image.load('./images/predator-small.png')
-			self.image = pygame.transform.scale(self.image, (int(spriteR*2), int(spriteR*2)))
+		self.sScale = .5
+		self.spriteR = 20 * self.sScale
 
-		
-	def update(self,screen,gameWindow, wallList):
-		#this ultimately calls the search algorithm, chooses the next step, and takes it
-		#will also need to check for, f.ex tag or escape states, either here or when update
-		#is called- could create list of Hunter positions, Runner positions, and check overlaps
-		agentPos = self.agentPos
-		self.algorithm(wallList,gameWindow)	
 
-		self.rect = pygame.Rect(self.agentPos[0]*2*spriteR,self.agentPos[1]*2*spriteR, spriteR, spriteR)
-		screen.blit(self.image,self.rect)
-		#screen.blit() is what actually draws the image to the screen.
-		#need to update the rect. with current coordinates before drawing
-		#print("X: ",agentPos[0]," Y: ", agentPos[1])
-		
-		
-	def algorithm(self,wallList , gameWindow):
-		if self.agentAlgorithm == None:
-			agentPos = self.agentPos
-			#random movement code
-			x = (random.randrange(0,3,1)-1)
-			y = (random.randrange(0,3,1)-1)
-			agentPos[0] += x
-			agentPos[1] += y
-			if not self.validMove(wallList):#undo move if collides with a wall
-				agentPos[0] -= x
-				agentPos[1] -= y
-				None
-			#print("Pos: ",agentPos)
-			self.agentPos = agentPos
-			#out of bounds collision.  real Agents should keep this from happening
-			#by not taking invalid moves offscreen
-			if agentPos[0] < 1:
-				agentPos[0] = 1
-			if agentPos[1] < 1:
-				agentPos[1] = 1
-			if agentPos[0] > (gameWindow[0]-2):
-				agentPos[0] = (gameWindow[0]-2)
-			if agentPos[1] > (gameWindow[1]-2):
-				agentPos[1] = (gameWindow[1]-2)
+		# TODO: Add vield of vision / direction facing variables
+
+		# TODO: Add functionality for map to decide where agents start
+		if self.agent_pos == None:
+			self.agent_pos = [random.randrange(3,gameWindow[0]-3,1),random.randrange(3,gameWindow[1]-3,1)]
+
+		# Create sprite image based on location and dimensions
+		self.rect = pygame.Rect(self.agent_pos[0],self.agent_pos[1], spriteR, spriteR)
+
+		# Assign Agent Algorithm
+		if _algorithm == "DFS":
+			self.algorithm = DFS(self.agent_pos, self.c_map)
+		elif _algorithm == "BFS":
+			self.algorithm = BFS(self.agent_pos, self.c_map)
+		elif _algorithm == "Astar":
+			self.algorithm = Astar(self.agent_pos, self.c_map)
+		elif _algorithm == "MinMax":
+			self.algorithm = MinMax(self.agent_pos, self.c_map)
+		elif _algorithm == "ExpMax":
+			self.algorithm = ExpMax(self.agent_pos, self.c_map)
 		else:
-			#use algorithm
-			None
+			print("Using generic algorithms.")
+			self.algorithm = genericAlgorithms()
+
+		# Assign Image
+		if self.roles == "hunter":
+			self.image = pygame.image.load('./images/predator-small.png')
+		if self.roles == "runner":
+			self.image = pygame.image.load('./images/waldo-small.png')
+		else:
+			print "ERROR: AGENTS.PY - COULD NOT FIND IMAGE."
+			exit()
+
+		# Resize image for gameWindow
+		self.image = pygame.transform.scale(self.image, (int(self.spriteR * 2), int(self.spriteR * 2)))
 
 
-	def validMove(self,wallList):
-		#this function, in this case, only checks if the proposed move is
-		#inside a wall.  More advanced agents may use a more elaborate function
-		p = self.agentPos
-		for i in wallList:
-			j = i.getPos()
-			if (j[0] == p[0]) and (j[1] == p[1]):
-				#print("Collision")
-				return False
-		return True
-	
-	def getposition(self):
-		return agentPos
+	def update(self, screen):
+		'''
+		This ultimately calls the search algorithm, chooses the next step, and takes it
+		will also need to check for, f.ex tag or escape states, either here or when update
+		is called: could create list of Hunter positions, Runner positions, and check overlaps
+		'''
+		self.agent_pos = self.algorithm.move()
+
+		self.rect = pygame.Rect(self.agent_pos[0] * 2 * spriteR,
+								self.agent_pos[1] * 2 * spriteR,
+								spriteR,
+								spriteR)
+
+		# Draw screen to image
+		screen.blit(self.image, self.rect)
