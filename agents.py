@@ -10,10 +10,11 @@
 ###########################################################################
 import random
 import pygame
+import algorithms
 
 class agent(pygame.sprite.Sprite):
-	def __init__(self, gameWindow,_current_pos=None, _image=None, _image2=None, _algorithm=None,
-				c_map, c_agent, c_alg, _role, _screen):
+	def __init__(self, gameWindow,c_map, c_agent, c_alg=None, _role=None,
+				_current_pos=None, _image=None, _image2=None, _algorithm=None):
 
 		# Create Sprite Object for Agent
 		pygame.sprite.Sprite.__init__(self)
@@ -37,7 +38,7 @@ class agent(pygame.sprite.Sprite):
 			self.agent_pos = [random.randrange(3,gameWindow[0]-3,1),random.randrange(3,gameWindow[1]-3,1)]
 
 		# Create sprite image based on location and dimensions
-		self.rect = pygame.Rect(self.agent_pos[0],self.agent_pos[1], spriteR, spriteR)
+		self.rect = pygame.Rect(self.agent_pos[0],self.agent_pos[1], self.spriteR, self.spriteR)
 
 		# Assign Agent Algorithm
 		if _algorithm == "DFS":
@@ -52,16 +53,17 @@ class agent(pygame.sprite.Sprite):
 			self.algorithm = ExpMax(self.agent_pos, self.c_map)
 		else:
 			print("Using generic algorithms.")
-			self.algorithm = genericAlgorithms()
+			self.algorithm = algorithms.genericAlgorithms(self.agent_pos, self.c_map)
 
 		# Assign Image
-		if self.roles == "hunter":
+		if self.role == "hunter":
 			self.image = pygame.image.load('./images/predator-small.png')
-		if self.roles == "runner":
+		if self.role == "runner":
 			self.image = pygame.image.load('./images/waldo-small.png')
 		else:
-			print "ERROR: AGENTS.PY - COULD NOT FIND IMAGE."
-			exit()
+			print("ERROR: AGENTS.PY - COULD NOT FIND IMAGE.")
+			#exit()
+			self.image = pygame.image.load('./images/waldo-small.png')
 
 		# Resize image for gameWindow
 		self.image = pygame.transform.scale(self.image, (int(self.spriteR * 2), int(self.spriteR * 2)))
@@ -75,10 +77,10 @@ class agent(pygame.sprite.Sprite):
 		'''
 		self.agent_pos = self.algorithm.move()
 
-		self.rect = pygame.Rect(self.agent_pos[0] * 2 * spriteR,
-								self.agent_pos[1] * 2 * spriteR,
-								spriteR,
-								spriteR)
+		self.rect = pygame.Rect(self.agent_pos[0] * 2 * self.spriteR,
+								self.agent_pos[1] * 2 * self.spriteR,
+								self.spriteR,
+								self.spriteR)
 
 		# Draw screen to image
 		screen.blit(self.image, self.rect)

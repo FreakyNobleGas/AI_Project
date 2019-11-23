@@ -8,14 +8,15 @@
 #
 ###########################################################################
 ###########################################################################
+import random
 
 class genericAlgorithms:
 	def __init__(self, agent_pos, c_map):
 		# Create Algorithm
-		self.agent_pos = agent_pos
+		self.agent_pos = (agent_pos[0],agent_pos[1])
 		self.c_map = c_map
-		self.wallList = c_map.get_map_bounds()
-		self.wallList.expand(c_map.get_walls())
+		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
+		#self.wallList.expand(c_map.get_walls())
 
 	def move(self):
 		# Random movement code
@@ -23,13 +24,13 @@ class genericAlgorithms:
 		y = (random.randrange(0,3,1)-1)
 
 		# Update current agent position
-		self.agent_pos[0] += x
-		self.agent_pos[1] += y
+		self.agent_pos= ((self.agent_pos[0] + x), (self.agent_pos[1] + y))
 
 		# Undo move if collides with a wall
+		print("p: ", self.agent_pos, " : ",self.wallList)
 		if self.agent_pos in self.wallList:
-			self.agent_pos[0] -= x
-			self.agent_pos[1] -= y
+			print("Collsiion")
+			self.agent_pos= ((self.agent_pos[0] - x), (self.agent_pos[1] - y))
 
 		return self.agent_pos
 

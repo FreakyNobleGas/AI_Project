@@ -20,6 +20,7 @@ import time
 import os.path
 import pygame
 import agents
+import maps
 
 
 sScale =.5
@@ -38,7 +39,7 @@ gameWindow = (100,100)
 
 class gameEngine():
 
-	def __init__(self,agentsList,wallList=None, c_map, c_agent, c_alg):
+	def __init__(self,agentsList,wallList, c_map, c_agent=None, c_alg=None):
 		self.wallList = wallList
 		wallGroup = pygame.sprite.Group()
 		maxX = 0
@@ -177,9 +178,12 @@ if __name__ == "__main__":
 	agentList = []
 	wallList = []
 	tempWalls = tempGetMap("maps/complex.txt")
+	c_map = maps.Map("maps/complex.txt")
+	c_agent = "hunter"
+	
 	for i in range(1,20):
-		agentList.append(agents.testAgent(gameWindow, c_map=c_map, c_agent=c_agent, c_alg=c_alg))
+		agentList.append(agents.agent(gameWindow, c_map=c_map, c_agent=c_agent, c_alg = "random", _role = "hunter"))
 	for i in tempWalls.getWalls():
 		#print(i)
 		wallList.append(wallTile(i))
-	gameEngine(agentList,wallList)
+	gameEngine(agentList,wallList, c_map)
