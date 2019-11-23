@@ -13,7 +13,7 @@ import pygame
 import algorithms
 
 class agent(pygame.sprite.Sprite):
-	def __init__(self, gameWindow,c_map, c_agent, c_alg=None, _role=None,
+	def __init__(self,c_map, c_agent, c_alg=None, _role=None,
 				_current_pos=None, _image=None, _image2=None, _algorithm=None):
 
 		# Create Sprite Object for Agent

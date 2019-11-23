@@ -54,6 +54,7 @@ class Map():
 					break
 				if m_asset is '=':
 					self.map_bounds.append((x_coord, y_coord))
+					#self.walls.append((x_coord, y_coord))
 				elif m_asset is '-' or m_asset is '|':
 					self.walls.append((x_coord, y_coord))
 				elif m_asset is 'S':

@@ -179,6 +179,7 @@ if __name__ == "__main__":
 	wallList = []
 	tempWalls = tempGetMap("maps/complex.txt")
 	c_map = maps.Map("maps/complex.txt")
+	#c_map.get_map_assets()
 	c_agent = "hunter"
 	
 	for i in range(1,20):
@@ -187,8 +188,6 @@ if __name__ == "__main__":
 			_role = "runner"
 		else:
 			_role = "hunter"
-		agentList.append(agents.agent(gameWindow, c_map=c_map, c_agent=c_agent, c_alg = "random", _role = _role))
-	for i in tempWalls.getWalls():
-		#print(i)
-		wallList.append(wallTile(i))
+		agentList.append(agents.agent(c_map=c_map, c_agent=c_agent, c_alg = "random", _role = _role))
+	wallList = [wallTile(i) for i in (c_map.get_walls()+c_map.get_map_bounds())] # Black Magic fuckery
 	gameEngine(agentList,wallList, c_map)
