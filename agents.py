@@ -27,7 +27,7 @@ class agent(pygame.sprite.Sprite):
 		self.role = _role
 		self.image = _image
 		self.image2 = _image2
-		self.sScale = .5
+		self.sScale = 1
 		self.spriteR = 20 * self.sScale
 
 
@@ -58,9 +58,9 @@ class agent(pygame.sprite.Sprite):
 		# Assign Image
 		print("Role: ", self.role)
 		if self.role == "hunter":
-			self.image = pygame.image.load('./images/predator-small.png')
+			self.image = pygame.image.load('./images/r-arrow-small.png')
 		elif self.role == "runner":
-			self.image = pygame.image.load('./images/waldo-small.png')
+			self.image = pygame.image.load('./images/b-arrow-small.png')
 		else:
 			print("ERROR: AGENTS.PY - COULD NOT FIND IMAGE.")
 			#exit()
@@ -80,8 +80,8 @@ class agent(pygame.sprite.Sprite):
 		move_result = self.algorithm.move()
 		self.agent_pos = move_result[0]
 		self.facing = move_result[1]
-		rotated_image = pygame.transform.rotate(self.image, 90*self.facing)
-		self.image = rotated_image
+		rotated_image = pygame.transform.rotate(self.image, 90*(self.facing))
+		#self.image = rotated_image
 		self.rect = pygame.Rect(self.agent_pos[0] * 2 * self.spriteR,
 								self.agent_pos[1] * 2 * self.spriteR,
 								self.spriteR,
@@ -89,4 +89,4 @@ class agent(pygame.sprite.Sprite):
 
 
 		# Draw screen to image
-		screen.blit(self.image, self.rect)
+		screen.blit(rotated_image, self.rect)

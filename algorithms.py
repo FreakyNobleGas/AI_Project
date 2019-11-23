@@ -17,34 +17,49 @@ class genericAlgorithms:
 		self.c_map = c_map
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
 		#self.wallList.expand(c_map.get_walls())
-		self.facing = 0 # facing is 0:N-1:E-2:S-3:W 
+		self.facing = 0 
 
 	def move(self):
 		# Old Random movement code
 		#x = (random.randrange(0,3,1)-1)
 		#y = (random.randrange(0,3,1)-1)
-		d = (random.randrange(0,5,1))
+		d = (random.randrange(0,3,1)) # Increase the max to decrease odds of turning
 		if d == 0: # turn Left
-			self.facing -=1
+			print("R")
+			self.facing -=0.5
 			if self.facing <0:
-				self.facing = 3
-		elif self.facing == 5:
-			self.facing +=1
-			if self.facing > 3:
+				self.facing = 3.5
+		elif d == 1:
+			print("L")
+			self.facing +=0.5
+			if self.facing > 3.5:
 				self.facing = 0
 		
 		# Take Step in Direction
+		print("S: ",self.facing)
 		if self.facing == 0:
-			x = -1
+			x = 1
 			y = 0
+		elif self.facing == 0.5:
+			x = 1
+			y = -1
 		elif self.facing == 1:
 			x = 0
 			y = -1
+		elif self.facing == 1.5:
+			x = -1
+			y = -1
 		elif self.facing == 2:
-			x = 1
+			x = -1
 			y = 0
-		else:# facing = 3:
+		elif self.facing == 2.5:
+			x = -1
+			y = 1
+		elif self.facing == 3:
 			x = 0
+			y = 1
+		else:# facing = 3.5:
+			x = 1
 			y = 1
 			
 

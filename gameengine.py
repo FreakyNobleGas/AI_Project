@@ -23,7 +23,7 @@ import agents
 import maps
 
 
-sScale =.5
+sScale =1
 spriteR = 20 * sScale
 #sprite radius.  should be directly related to sprite/grid size
 #currently, all sprites are 40x40, so sR=20
@@ -177,10 +177,10 @@ class wallTile(pygame.sprite.Sprite):
 if __name__ == "__main__":
 	agentList = []
 	wallList = []
-	tempWalls = tempGetMap("maps/complex.txt")
-	c_map = maps.Map("maps/complex.txt")
+	tempWalls = tempGetMap("maps/complex2.txt")
+	c_map = maps.Map("maps/complex2.txt")
 	#c_map.get_map_assets()
-	c_agent = "hunter"
+	c_agent_list = []
 	
 	for i in range(1,20):
 		r = random.randrange(0,5,1)
@@ -188,6 +188,6 @@ if __name__ == "__main__":
 			_role = "runner"
 		else:
 			_role = "hunter"
-		agentList.append(agents.agent(c_map=c_map, c_agent=c_agent, c_alg = "random", _role = _role))
+		agentList.append(agents.agent(c_map=c_map, c_agent_list=c_agent_list, c_alg = "random", _role = _role))
 	wallList = [wallTile(i) for i in (c_map.get_walls()+c_map.get_map_bounds())] # Black Magic fuckery
 	gameEngine(agentList,wallList, c_map)
