@@ -76,12 +76,17 @@ class agent(pygame.sprite.Sprite):
 		will also need to check for, f.ex tag or escape states, either here or when update
 		is called: could create list of Hunter positions, Runner positions, and check overlaps
 		'''
-		self.agent_pos = self.algorithm.move()
-
+		#self.agent_pos = self.algorithm.move()
+		move_result = self.algorithm.move()
+		self.agent_pos = move_result[0]
+		self.facing = move_result[1]
+		rotated_image = pygame.transform.rotate(self.image, 90*self.facing)
+		self.image = rotated_image
 		self.rect = pygame.Rect(self.agent_pos[0] * 2 * self.spriteR,
 								self.agent_pos[1] * 2 * self.spriteR,
 								self.spriteR,
 								self.spriteR)
+		
 
 		# Draw screen to image
 		screen.blit(self.image, self.rect)

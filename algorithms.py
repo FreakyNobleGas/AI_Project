@@ -17,11 +17,36 @@ class genericAlgorithms:
 		self.c_map = c_map
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
 		#self.wallList.expand(c_map.get_walls())
+		self.facing = 0 # facing is 0:N-1:E-2:S-3:W 
 
 	def move(self):
-		# Random movement code
-		x = (random.randrange(0,3,1)-1)
-		y = (random.randrange(0,3,1)-1)
+		# Old Random movement code
+		#x = (random.randrange(0,3,1)-1)
+		#y = (random.randrange(0,3,1)-1)
+		d = (random.randrange(0,5,1))
+		if d == 0: # turn Left
+			self.facing -=1
+			if self.facing <0:
+				self.facing = 3
+		elif self.facing == 5:
+			self.facing +=1
+			if self.facing > 3:
+				self.facing = 0
+		
+		# Take Step in Direction
+		if self.facing == 0:
+			x = -1
+			y = 0
+		elif self.facing == 1:
+			x = 0
+			y = -1
+		elif self.facing == 2:
+			x = 1
+			y = 0
+		else:# facing = 3:
+			x = 0
+			y = 1
+			
 
 		# Update current agent position
 		self.agent_pos= ((self.agent_pos[0] + x), (self.agent_pos[1] + y))
@@ -32,7 +57,7 @@ class genericAlgorithms:
 			#print("Collsiion")
 			self.agent_pos= ((self.agent_pos[0] - x), (self.agent_pos[1] - y))
 
-		return self.agent_pos
+		return (self.agent_pos, self.facing)
 
 class DFS:
 	def __init__(self):
