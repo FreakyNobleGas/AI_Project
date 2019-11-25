@@ -10,7 +10,40 @@
 ###########################################################################
 import random
 
-class genericAlgorithms:
+class baseAlgorithm:
+	def __init__(self, agent_pos, c_map, agent_list = None):
+		self.agent_pos = (agent_pos[0],agent_pos[1])
+		self.c_map = c_map
+		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
+		self.facing = 0 
+		self.agent_list = agent_list
+
+	def isValidMove(self,plannedPosition):
+		# takes a position, and returns if the move would collide with 
+		# a world object.  Needed for the algorithms
+		if plannedPosition in self.wallList:
+			#print("isValidMove wall collision")
+			return False
+		return True
+		
+	def manhattanDistance(self,pos1,pos2):
+		# If I understand it correctly, Manhattan Distance is the
+		# x-delta + y-delta
+		return (abs(pos1[0]-pos2[0])+abs(pos1[1]-pos2[1]))
+	
+	def cardinalDir(self):
+		# will ultimately return the rough (N-S-E-W) direction to 
+		# the nearest runner in agent_list
+		# to simulate basic "hearing"
+		# this could be expanded to use diagonals, but may overly
+		#expand the scope of the project
+		None
+
+
+class genericAlgorithms(baseAlgorithm):
+	# This generic algorithm is a basic structure to show how to 
+	# interface between the agent and algorithm in a way that the game
+	# engine can use the data
 	def __init__(self, agent_pos, c_map):
 		# Create Algorithm
 		self.agent_pos = (agent_pos[0],agent_pos[1])
@@ -20,23 +53,21 @@ class genericAlgorithms:
 		self.facing = 0 
 
 	def move(self):
-		# Old Random movement code
-		#x = (random.randrange(0,3,1)-1)
-		#y = (random.randrange(0,3,1)-1)
-		d = (random.randrange(0,3,1)) # Increase the max to decrease odds of turning
+		d = (random.randrange(0,3,1)) 
+		# Increase the max to decrease odds of turning
 		if d == 0: # turn Left
-			print("R")
+			#print("R")
 			self.facing -=0.5
 			if self.facing <0:
 				self.facing = 3.5
 		elif d == 1:
-			print("L")
+			#print("L")
 			self.facing +=0.5
 			if self.facing > 3.5:
 				self.facing = 0
 		
 		# Take Step in Direction
-		print("S: ",self.facing)
+		#print("S: ",self.facing)
 		if self.facing == 0:
 			x = 1
 			y = 0
@@ -62,25 +93,95 @@ class genericAlgorithms:
 			x = 1
 			y = 1
 			
-
-		# Update current agent position
-		self.agent_pos= ((self.agent_pos[0] + x), (self.agent_pos[1] + y))
-
+		# Old movement check code - moved into baseAlgorithm.isValidMove()
+		# Update current agent position OLD. 
+		#self.agent_pos= ((self.agent_pos[0] + x), (self.agent_pos[1] + y))
 		# Undo move if collides with a wall
 		#print("p: ", self.agent_pos, " : ",self.wallList)
-		if self.agent_pos in self.wallList:
+		#if self.agent_pos in self.wallList:
 			#print("Collsiion")
-			self.agent_pos= ((self.agent_pos[0] - x), (self.agent_pos[1] - y))
+			#self.agent_pos= ((self.agent_pos[0] - x), (self.agent_pos[1] - y))
+		if self.isValidMove(((self.agent_pos[0] + x), (self.agent_pos[1] + y))):
+			self.agent_pos= ((self.agent_pos[0] + x), (self.agent_pos[1] + y))
 
 		return (self.agent_pos, self.facing)
 
+
+
+class testAlgorithm(baseAlgorithm):
+	def __init__(self, agent_pos, c_map, c_agent_list):
+		self.agent_pos = (agent_pos[0],agent_pos[1])
+		self.c_map = c_map
+		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
+		self.facing = 0 
+		self.agent_list = c_agent_list
+		#print("Ag: ",self.agent_list)
+		
+	def move(self):
+		# get best direction from current position
+		# then step in that direction
+		newPos = self.bestDir(self.agent_pos, 5) # 
+		#print("NP:",newPos)
+		self.agent_pos = (newPos[0],newPos[1])
+		return self.agent_pos,0
+	
+	def bestDir(self,pPos,remainingDepth):
+		pList = []
+		bestPos = 0
+		bestVal = 999999999
+		# up: 0 -1
+		# dn: 0 +1
+		# lf: -1 0
+		# rt: +1 0
+		# this set initializes the NSEW squares in a list, if valid
+		# There is probably a better way to do this
+		if self.isValidMove(((pPos[0]),(pPos[1]-1))):
+			pList.append((((pPos[0]),(pPos[1]-1)),999999999))
+		if self.isValidMove(((pPos[0]),(pPos[1]+1))):
+			pList.append((((pPos[0]),(pPos[1]+1)),999999999))
+		if self.isValidMove(((pPos[0]-1),(pPos[1]))):
+			pList.append((((pPos[0]-1),(pPos[1])),999999999))
+		if self.isValidMove(((pPos[0]+1),(pPos[1]))):
+			pList.append((((pPos[0]+1),(pPos[1])),999999999))
+		# all valid positions now in a list
+		#print( "PL ", pList)
+		# pList is [((x,y),manhattanDist),...]
+		for i in range(0,len(pList)):
+			# for each square, go through list of agents, finding the closest
+			bestVal = 99999999
+			for agent in self.agent_list:
+				# find closest agent's distance
+				agentVal = self.manhattanDistance(pList[i][0], agent.getPos())
+				#print("pp ",pList[i][0]," ap ", agent.getPos()," ",agentVal)
+				if (agentVal < bestVal) and not(agent.getType() == "hunter"):
+					# NOTE: this is currently set as a dedicated hunter-only
+					# algorithm.  only works for hunters chasing runners
+					# (to avoid chasing itself and not moving)
+					bestVal = agentVal
+			pList[i] = ((pList[i][0]),bestVal)
+			# the above loop should find the closest agent to that position,
+			# and sets the value for the position being checked to that
+			# value
+		bestIndex = None
+		bestVal = 999999999
+		for i in range(0,len(pList)):
+			if ((pList[i][1]) < bestVal):
+				bestVal = pList[i][1]
+				bestIndex = i
+		print("PL ", pList, " BI ", pList[bestIndex])
+		return pList[bestIndex][0]
+				
 class DFS:
+	# NOTE: DFS may not work well in this setup- need a map with paths
+	# to be able to limit depth paths (and avoid looping)
 	def __init__(self):
 		pass
 
 class BFS:
+	# NOTE: DFS may not work well in this setup- need a map with paths
+	# to be able to limit depth paths (and avoid looping)
 	def __init__(self):
-		pass
+		pass	
 
 class Astar:
 	def __init__(self):

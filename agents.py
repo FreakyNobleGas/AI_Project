@@ -30,6 +30,7 @@ class agent(pygame.sprite.Sprite):
 		self.image2 = _image2
 		self.sScale = 1
 		self.spriteR = 20 * self.sScale
+		_algorithm = c_alg
 
 
 		# TODO: Add vield of vision / direction facing variables
@@ -45,13 +46,15 @@ class agent(pygame.sprite.Sprite):
 		if _algorithm == "DFS":
 			self.algorithm = DFS(self.agent_pos, self.c_map)
 		elif _algorithm == "BFS":
-			self.algorithm = BFS(self.agent_pos, self.c_map)
+			self.algorithm = algorithms.BFS(self.agent_pos, self.c_map)
 		elif _algorithm == "Astar":
 			self.algorithm = Astar(self.agent_pos, self.c_map)
 		elif _algorithm == "MinMax":
 			self.algorithm = MinMax(self.agent_pos, self.c_map)
 		elif _algorithm == "ExpMax":
 			self.algorithm = ExpMax(self.agent_pos, self.c_map)
+		elif _algorithm == "test":
+			self.algorithm = algorithms.testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list)
 		else:
 			print("Using generic algorithms.")
 			self.algorithm = algorithms.genericAlgorithms(self.agent_pos, self.c_map)
@@ -88,6 +91,12 @@ class agent(pygame.sprite.Sprite):
 								self.spriteR,
 								self.spriteR)
 
-
 		# Draw screen to image
 		screen.blit(rotated_image, self.rect)
+
+	def getPos(self):
+		return self.agent_pos
+	
+	def getType(self):
+		return self.role
+	

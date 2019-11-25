@@ -182,12 +182,13 @@ if __name__ == "__main__":
 	#c_map.get_map_assets()
 	c_agent_list = []
 	
-	for i in range(1,20):
+	for i in range(0,5):
 		r = random.randrange(0,5,1)
 		if r == 0:
 			_role = "runner"
 		else:
-			_role = "hunter"
+			_role = "runner"
 		agentList.append(agents.agent(c_map=c_map, c_agent_list=c_agent_list, c_alg = "random", _role = _role))
-	wallList = [wallTile(i) for i in (c_map.get_walls()+c_map.get_map_bounds())] # Black Magic fuckery
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "test", _role ="hunter"))
+	wallList = [wallTile(i) for i in (c_map.get_walls()+c_map.get_map_bounds())] # Black Magic
 	gameEngine(agentList,wallList, c_map)
