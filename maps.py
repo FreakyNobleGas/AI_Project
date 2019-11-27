@@ -20,6 +20,8 @@ class Map():
 		self.safe_zone = []
 		self.walls = []
 		self.map_bounds = []
+		self.x_bound = None
+		self.y_bound = None
 		self.map_name = map_name
 		self.get_map_assets(map_name)
 		
@@ -65,11 +67,47 @@ class Map():
 		
 		game_map.close()
 		
+		self.x_bound = x_coord
+		self.y_bound = y_coord
+		
 	def get_walls(self):
 		return self.walls
 	
+	def out_of_bounds(self, move):
+		"""
+		Checks to see if (x, y) is inside of map and not in a wall.
+		
+		:move: A tuple that contains the x and y coordinates of a move.
+		"""
+		if move[0] < 0 or move[0] > self.x_bound or move[1] < 0 or move[1] > self.y_bound:
+			return False
+		elif move in self.walls or move in self.map_bounds:
+			return False
+		else:
+			return True
+			
 	def get_map_bounds(self):
 		return self.map_bounds
 		
 	def get_safezone(self):
 		return self.safe_zone
+		
+	def get_next(self, agent_position):
+		"""
+		Takes a current position and returns possible moves based on that position.
+		
+		:agent_position: A tupple of the agent's current position.
+		"""
+		valid_moves = []
+		north = (agent_position[0], agent_position[1] + 1)
+		south = (agent_position[0], agent_position[1] - 1)
+		east = (agent_position[0] + 1, agent_position[1])
+		west = (agent_position[0] - 1, agent_position[1])
+		next_moves = [(north, 3), (south, 1), (east, 0), (west, 2)]
+		
+		for move, direction in next_moves:
+			 if self.out_of_bounds(move):
+				 valid_moves.append((move, direction))
+		
+		return valid_moves
+		

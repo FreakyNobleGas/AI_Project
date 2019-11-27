@@ -174,14 +174,93 @@ class testAlgorithm(baseAlgorithm):
 class DFS:
 	# NOTE: DFS may not work well in this setup- need a map with paths
 	# to be able to limit depth paths (and avoid looping)
-	def __init__(self):
-		pass
+	def __init__(self, agent_pos, c_map, c_agent_list):
+		self.current_pos = agent_pos
+		self.c_map = c_map
+		self.agents = c_agent_list
+		
+	def move(self, cur_pos):
+		# Caller function for dfs
+		return self.dfs(cur_pos, self.c_map, self.agents)
+		
+	def dfs(self, agent_pos, c_map, c_agent_list):
+		"""
+		Depth First Search algorithm.
+		
+		:agent_pos: Current agent position, (x, y) tuple.
+		
+		:c_map: Map object for obtaining walls, boundries, and safe zones.
+		
+		:c_agent_list: List of agent objects for iterating through and finding next moves of each agent.
+		"""
+		visited = []
+		path = []
+		current_pos = (agent_pos[0], agent_pos[1])
+		for agent in self.agents: 
+			pos_form = agent.getPos()
+			if (pos_form[0] == current_pos[0]) and (pos_form[1] == current_pos[1]):
+				current_agent = agent
+		visited.append(current_pos)
+		path.append((current_pos, 0))
+		while path:
+			flag = True
+			possible_moves = self.c_map.get_next(current_pos)
+			for move, direction in possible_moves:
+				if current_agent.isGoal(move):
+					path.append((move, direction))
+					return path
+				elif move not in visited:
+					flag = False
+					visited.append(move)
+					path.append((move, direction))
+					current_pos = move
+					break
+			if flag:
+				path.pop(-1)
+				if path:
+					current_pos = path[-1][0]
+				
 
 class BFS:
-	# NOTE: DFS may not work well in this setup- need a map with paths
-	# to be able to limit depth paths (and avoid looping)
-	def __init__(self):
-		pass	
+	def __init__(self, agent_pos, c_map, c_agent_list):
+		self.current_pos = agent_pos
+		self.c_map = c_map
+		self.agents = c_agent_list
+		
+	def move(self, cur_pos):
+		# Caller function for bfs
+		return self.bfs(cur_pos, self.c_map, self.agents)
+		
+	def bfs(self, agent_pos, c_map, c_agent_list):
+		visited = []
+		queue = []
+		path_map = {}
+		current_pos = (agent_pos[0], agent_pos[1])
+		path_map[(current_pos,0)] = 'END'
+		for agent in self.agents: 
+			pos_form = agent.getPos()
+			if (pos_form[0] == current_pos[0]) and (pos_form[1] == current_pos[1]):
+				current_agent = agent
+		visited.append(current_pos)
+		queue.append((current_pos, 0))
+		while queue:
+			current_pos = queue.pop(0)
+			possible_moves = self.c_map.get_next(current_pos[0])
+			for move, direction in possible_moves:
+				if current_agent.isGoal(move):
+					print('GOAL')
+					path_map[(move, direction)] = (current_pos)
+					com = path_map[current_pos]
+					return_list = [(move, direction)]
+					while com is not 'END':
+						return_list.append(com)
+						com = path_map[com]
+					return_list.reverse()
+					return return_list
+				elif move not in visited:
+					path_map[(move, direction)] = (current_pos)
+					visited.append(move)
+					queue.append((move, direction))
 
 class Astar:
 	def __init__(self):

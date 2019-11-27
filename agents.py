@@ -10,7 +10,7 @@
 ###########################################################################
 import random
 import pygame
-import algorithms
+from algorithms import *
 
 class agent(pygame.sprite.Sprite):
 	def __init__(self, c_map, c_agent_list=None, c_alg=None, _role=None,
@@ -30,6 +30,7 @@ class agent(pygame.sprite.Sprite):
 		self.image2 = _image2
 		self.sScale = 1
 		self.spriteR = 20 * self.sScale
+		self.com_mag = None
 		_algorithm = c_alg
 
 
@@ -37,16 +38,16 @@ class agent(pygame.sprite.Sprite):
 
 		# TODO: Add functionality for map to decide where agents start
 		if self.agent_pos == None:
-			self.agent_pos = [5,5]#[random.randrange(5,gameWindow[0]-5,1),random.randrange(5,gameWindow[1]-5,1)]
+			self.agent_pos = [1,1]#[random.randrange(5,gameWindow[0]-5,1),random.randrange(5,gameWindow[1]-5,1)]
 
 		# Create sprite image based on location and dimensions
 		self.rect = pygame.Rect(self.agent_pos[0],self.agent_pos[1], self.spriteR, self.spriteR)
 
 		# Assign Agent Algorithm
 		if _algorithm == "DFS":
-			self.algorithm = DFS(self.agent_pos, self.c_map)
+			self.algorithm = DFS(self.agent_pos, self.c_map, c_agent_list)
 		elif _algorithm == "BFS":
-			self.algorithm = algorithms.BFS(self.agent_pos, self.c_map)
+			self.algorithm = BFS(self.agent_pos, self.c_map, c_agent_list)
 		elif _algorithm == "Astar":
 			self.algorithm = Astar(self.agent_pos, self.c_map)
 		elif _algorithm == "MinMax":
@@ -54,7 +55,7 @@ class agent(pygame.sprite.Sprite):
 		elif _algorithm == "ExpMax":
 			self.algorithm = ExpMax(self.agent_pos, self.c_map)
 		elif _algorithm == "test":
-			self.algorithm = algorithms.testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list)
+			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list)
 		else:
 			print("Using generic algorithms.")
 			self.algorithm = algorithms.genericAlgorithms(self.agent_pos, self.c_map)
@@ -81,9 +82,24 @@ class agent(pygame.sprite.Sprite):
 		is called: could create list of Hunter positions, Runner positions, and check overlaps
 		'''
 		#self.agent_pos = self.algorithm.move()
-		move_result = self.algorithm.move()
-		self.agent_pos = move_result[0]
-		self.facing = move_result[1]
+		# Possible way of doing persistant commands by checking for existing commands in the object.
+		if not self.com_mag:
+			move_result = self.algorithm.move(self.agent_pos)
+		# If move_result is a list of tupples set self.com_mag
+			if isinstance(move_result, list):
+				first_result = move_result[0]
+				self.agent_pos = first_result[0]
+				self.facing = first_result[1]
+				move_result.pop(0)
+				self.com_mag = move_result
+			else:	
+				self.agent_pos = move_result[0]
+				self.facing = move_result[1]
+		else:
+			first_result = self.com_mag[0]
+			self.agent_pos = first_result[0]
+			self.facing = first_result[1]
+			self.com_mag.pop(0)
 		rotated_image = pygame.transform.rotate(self.image, 90*(self.facing))
 		#self.image = rotated_image
 		self.rect = pygame.Rect(self.agent_pos[0] * 2 * self.spriteR,
@@ -99,4 +115,23 @@ class agent(pygame.sprite.Sprite):
 	
 	def getType(self):
 		return self.role
+		
+	def isGoal(self, position):
+		# hunters = [agent for agent in self.agents if agent.role is 'hunter']
+		runners = [agent for agent in self.c_agent_list if agent.role is 'runner']
+		# Check for role of agent then return true based on criteria
+		if self.role is 'hunter':
+			# Hunter criteria
+			for runner in runners:
+				if postion is runner.getPos():
+					return True
+					
+		elif self.role is 'runner':
+			# Runner criteria
+			if position in self.c_map.get_safezone():
+				return True
+				
+		# Return False fallthrough
+		return False
+			
 	

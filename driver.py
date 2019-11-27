@@ -37,7 +37,7 @@ class Driver:
     def driver_window(self):
         print("BEGIN MAIN")
         # mainWindow object contains c_map for map object , c_alg for algorithm object,
-        # and a dictionary {'Hunter':[hunter obj list], 'Runner':[runner obj list].
+        # and a dictionary {'hunter': # of hunters, 'Runner': # of runners}.
         window = mainWindow()
         print (window.c_map)
         print (window.c_agents)
@@ -53,13 +53,14 @@ class Driver:
         # Generate list of agent objects from dict c_agents
         for role, total in c_agents.items():
             for i in range(total):
-                agentList.append(agent(c_map=newMap, c_alg=c_alg, _role=role))
+                agentList.append(agent(c_map=newMap, c_agent_list=agentList, c_alg=c_alg, _role=role))
 
         return newMap, wallList, agentList
 
     def run_game(self, c_map, c_agents, c_alg):
         newMap, wallList, agentList = self.formatter(c_map, c_agents, c_alg)
         gameEngine(agentList, wallList, newMap)
+        
 
 
 if __name__ == "__main__":
