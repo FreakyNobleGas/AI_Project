@@ -191,9 +191,9 @@ if __name__ == "__main__":
 			_role = "runner"
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=c_agent_list, c_alg = "DFS", _role = _role))
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "test", _role ="hunter"))'''
-	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "DFS", _role ="runner"))
-	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="runner"))
-	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter",_rand=20))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "DFS", _role ="runner", _index = (len(agentList))))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="runner", _index = (len(agentList))))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter",_rand=20, _index = (len(agentList))))
 	#c_agent_list.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "test", _role ="hunter"))
 	
 	

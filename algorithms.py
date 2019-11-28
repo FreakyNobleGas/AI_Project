@@ -11,7 +11,7 @@
 import random
 
 class baseAlgorithm:
-	def __init__(self, agent_pos, c_map, agent_list = None):
+	def __init__(self, agent_pos, c_map, agent_list = None, listIndex = None):
 		self.agent_pos = (agent_pos[0],agent_pos[1])
 		self.c_map = c_map
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
@@ -109,7 +109,7 @@ class genericAlgorithms(baseAlgorithm):
 
 
 class testAlgorithm(baseAlgorithm):
-	def __init__(self, agent_pos, c_map, c_agent_list):
+	def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
 		self.agent_pos = (agent_pos[0],agent_pos[1])
 		self.c_map = c_map
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
@@ -173,13 +173,14 @@ class testAlgorithm(baseAlgorithm):
 
 
 class Reflex(baseAlgorithm):
-	def __init__(self, agent_pos, c_map, c_agent_list, randomness):
+	def __init__(self, agent_pos, c_map, c_agent_list, randomness, listIndex):
 		self.agent_pos = (agent_pos[0],agent_pos[1])
 		self.c_map = c_map
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
 		self.facing = 0 
 		self.agent_list = c_agent_list
 		self.rand = randomness
+		self.lIndex = listIndex
 		#randomness is the chance to go in a random direction
 		
 		
@@ -223,7 +224,8 @@ class Reflex(baseAlgorithm):
 			for agent in self.agent_list:
 				# find closest agent's distance
 				agentVal = self.manhattanDistance(pList[i][0], agent.getPos())
-				if (agentVal < bestVal) and not(agent.getType() == "hunter"):
+				#if (agentVal < bestVal) and not(agent.getType() == "hunter"): # old hardcoded check
+				if (agentVal < bestVal) and not(agent.getType() == self.agent_list[self.lIndex].getType()):
 					# NOTE: this is currently set as a dedicated hunter-only
 					# algorithm.  only works for hunters chasing runners
 					# (to avoid chasing itself and not moving)
@@ -247,7 +249,7 @@ class Reflex(baseAlgorithm):
 class DFS:
 	# NOTE: DFS may not work well in this setup- need a map with paths
 	# to be able to limit depth paths (and avoid looping)
-	def __init__(self, agent_pos, c_map, c_agent_list):
+	def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list
@@ -295,7 +297,7 @@ class DFS:
 				
 
 class BFS:
-	def __init__(self, agent_pos, c_map, c_agent_list):
+	def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list

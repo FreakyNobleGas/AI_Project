@@ -53,7 +53,7 @@ class Driver:
         # Generate list of agent objects from dict c_agents
         for role, total in c_agents.items():
             for i in range(total):
-                agentList.append(agent(c_map=newMap, c_agent_list=agentList, c_alg=c_alg, _role=role))
+                agentList.append(agent(c_map=newMap, c_agent_list=agentList, c_alg=c_alg, _role=role, _index = len(agentList)))
 
         return newMap, wallList, agentList
 

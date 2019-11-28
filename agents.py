@@ -14,7 +14,7 @@ from algorithms import *
 
 class agent(pygame.sprite.Sprite):
 	def __init__(self, c_map, c_agent_list=None, c_alg=None, _role=None,
-				_current_pos=None, _image=None, _image2=None, _algorithm=None, _rand = 0):
+				_current_pos=None, _image=None, _image2=None, _algorithm=None, _rand = 0, _index = None):
 
 		# Create Sprite Object for Agent
 		pygame.sprite.Sprite.__init__(self)
@@ -34,6 +34,8 @@ class agent(pygame.sprite.Sprite):
 		_algorithm = c_alg
 		self.facing = 0
 		self.rand = _rand
+		self.lIndex = _index
+		print("lInd- ",_index)
 
 
 		# TODO: Add vield of vision / direction facing variables
@@ -50,19 +52,19 @@ class agent(pygame.sprite.Sprite):
 
 		# Assign Agent Algorithm
 		if _algorithm == "DFS":
-			self.algorithm = DFS(self.agent_pos, self.c_map, c_agent_list)
+			self.algorithm = DFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
 		elif _algorithm == "BFS":
-			self.algorithm = BFS(self.agent_pos, self.c_map, c_agent_list)
+			self.algorithm = BFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
 		elif _algorithm == "Astar":
-			self.algorithm = Astar(self.agent_pos, self.c_map)
+			self.algorithm = Astar(self.agent_pos, self.c_map, self.lIndex)
 		elif _algorithm == "MinMax":
-			self.algorithm = MinMax(self.agent_pos, self.c_map)
+			self.algorithm = MinMax(self.agent_pos, self.c_map, self.lIndex)
 		elif _algorithm == "ExpMax":
-			self.algorithm = ExpMax(self.agent_pos, self.c_map)
+			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.lIndex)
 		elif _algorithm == "Reflex":
-			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand)
+			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
 		elif _algorithm == "test":
-			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list)
+			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
 		
 		else:
 			print("Using generic algorithms.")
