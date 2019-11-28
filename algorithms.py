@@ -253,12 +253,13 @@ class DFS:
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list
+		self.lIndex = listIndex
 		
 	def move(self, cur_pos):
 		# Caller function for dfs
 		return self.dfs(cur_pos, self.c_map, self.agents)
 		
-	def dfs(self, agent_pos, c_map, c_agent_list):
+	def dfs(self):
 		"""
 		Depth First Search algorithm.
 		
@@ -301,6 +302,7 @@ class BFS:
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list
+		self.lIndex = listIndex
 		
 	def move(self, cur_pos):
 		# Caller function for bfs
@@ -342,9 +344,48 @@ class Astar:
 		pass
 
 class MinMax:
-	def __init__(self):
-		pass
-
+	def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
+		self.current_pos = agent_pos
+		self.c_map = c_map
+		self.agents = c_agent_list
+		self.lIndex = listIndex
+		self.depth = 2
+		
+	def move(self):
+		self.minmax()
+		
+	def minmax(self):
+		def get_min(agent_pos_list, cur_depth, cur_agent):
+			max_successors = []
+			
+			actions = self.c_map.get_next(agent_pos_list[cur_agent])
+			
+			for action in actions:
+				agent_pos_list[cur_agent] = action
+				max_successors.append(mm_driver(agent_pos_list, current_depth, current_agent + 1))
+			
+		
+		def get_max(agent_pos_list, cur_depth, cur_agent):
+			min_successors = []
+			
+			actions = self.c_map.get_next(agent_pos_list[cur_agent])
+			
+			for action in actions:
+				agent_pos_list[cur_agent] = action
+				min_successors.append(mm_driver(agent_pos_list, current_depth, current_agent + 1))
+				
+			return max(min_successors)
+			
+		def mm_driver(agent_pos_list, cur_depth, cur_agent):
+			
+			if current_agent is len(c_agent_list):
+				current_depth += 1
+			
+			if (current_depth >= self.depth):
+				return "SCORE STATES" # Add state scoring
+			
+			if current_agent is calling agent:
+				return get_max(agent_pos_list, current_depth, current_agent)
 class ExpMax:
 	def __init__(self):
 		pass
