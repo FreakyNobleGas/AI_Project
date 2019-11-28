@@ -14,7 +14,7 @@ from algorithms import *
 
 class agent(pygame.sprite.Sprite):
 	def __init__(self, c_map, c_agent_list=None, c_alg=None, _role=None,
-				_current_pos=None, _image=None, _image2=None, _algorithm=None):
+				_current_pos=None, _image=None, _image2=None, _algorithm=None, _rand = 0):
 
 		# Create Sprite Object for Agent
 		pygame.sprite.Sprite.__init__(self)
@@ -33,6 +33,7 @@ class agent(pygame.sprite.Sprite):
 		self.com_mag = None
 		_algorithm = c_alg
 		self.facing = 0
+		self.rand = _rand
 
 
 		# TODO: Add vield of vision / direction facing variables
@@ -58,8 +59,11 @@ class agent(pygame.sprite.Sprite):
 			self.algorithm = MinMax(self.agent_pos, self.c_map)
 		elif _algorithm == "ExpMax":
 			self.algorithm = ExpMax(self.agent_pos, self.c_map)
+		elif _algorithm == "Reflex":
+			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand)
 		elif _algorithm == "test":
 			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list)
+		
 		else:
 			print("Using generic algorithms.")
 			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map)

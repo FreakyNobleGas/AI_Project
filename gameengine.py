@@ -177,8 +177,8 @@ class wallTile(pygame.sprite.Sprite):
 if __name__ == "__main__":
 	agentList = []
 	wallList = []
-	tempWalls = tempGetMap("maps/pacman.txt")
-	c_map = maps.Map("maps/pacman.txt")
+	#tempWalls = tempGetMap("maps/pacman.txt")
+	c_map = maps.Map("maps/complex2.txt")
 	#c_map.get_map_assets()
 	c_agent_list = []
 	'''
@@ -192,7 +192,8 @@ if __name__ == "__main__":
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=c_agent_list, c_alg = "DFS", _role = _role))
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "test", _role ="hunter"))'''
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "DFS", _role ="runner"))
-	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "test", _role ="hunter"))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="runner"))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter",_rand=20))
 	#c_agent_list.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "test", _role ="hunter"))
 	
 	

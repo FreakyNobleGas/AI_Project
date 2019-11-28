@@ -170,6 +170,79 @@ class testAlgorithm(baseAlgorithm):
 				bestIndex = i
 		#print("PL ", pList, " BI ", pList[bestIndex])
 		return pList[bestIndex][0]
+
+
+class Reflex(baseAlgorithm):
+	def __init__(self, agent_pos, c_map, c_agent_list, randomness):
+		self.agent_pos = (agent_pos[0],agent_pos[1])
+		self.c_map = c_map
+		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
+		self.facing = 0 
+		self.agent_list = c_agent_list
+		self.rand = randomness
+		#randomness is the chance to go in a random direction
+		
+		
+	def move(self,unusedPos=None):
+		# get best direction from current position
+		# then step in that direction
+		newPos = self.bestDir(self.agent_pos)
+		self.agent_pos = (newPos[0],newPos[1])
+		return self.agent_pos,0
+	
+	def bestDir(self,pPos):
+		pList = []
+		bestPos = 0
+		bestVal = 999999999
+		# up: 0 -1
+		# dn: 0 +1
+		# lf: -1 0
+		# rt: +1 0
+		# this set initializes the NSEW squares in a list, if valid
+		# There is probably a better way to do this
+		if self.isValidMove(((pPos[0]),(pPos[1]-1))):
+			pList.append((((pPos[0]),(pPos[1]-1)),999999999))
+		if self.isValidMove(((pPos[0]),(pPos[1]+1))):
+			pList.append((((pPos[0]),(pPos[1]+1)),999999999))
+		if self.isValidMove(((pPos[0]-1),(pPos[1]))):
+			pList.append((((pPos[0]-1),(pPos[1])),999999999))
+		if self.isValidMove(((pPos[0]+1),(pPos[1]))):
+			pList.append((((pPos[0]+1),(pPos[1])),999999999))
+		# all valid positions now in a list
+		# pList is [((x,y),manhattanDist),...]
+		# manhattanDist val is init as a very large value, vastly larger
+		# than expected max paths
+		if (self.rand >= (random.randrange(0,100,1))):
+			# random move with self.rand as the threshold
+			return pList[random.randrange(0,len(pList),1)][0]
+		
+		# else keep going
+		for i in range(0,len(pList)):
+			# for each square, go through list of agents, finding the closest
+			bestVal = 99999999
+			for agent in self.agent_list:
+				# find closest agent's distance
+				agentVal = self.manhattanDistance(pList[i][0], agent.getPos())
+				if (agentVal < bestVal) and not(agent.getType() == "hunter"):
+					# NOTE: this is currently set as a dedicated hunter-only
+					# algorithm.  only works for hunters chasing runners
+					# (to avoid chasing itself and not moving)
+					bestVal = agentVal
+			pList[i] = ((pList[i][0]),bestVal)
+			# the above loop should find the closest agent to that position,
+			# and sets the value for the position being checked to that
+			# value
+		bestIndex = None
+		bestVal = 999999999
+		for i in range(0,len(pList)):
+			if ((pList[i][1]) < bestVal):
+				bestVal = pList[i][1]
+				bestIndex = i
+		#print("PL ", pList, " BI ", pList[bestIndex])
+		return pList[bestIndex][0]
+
+
+
 				
 class DFS:
 	# NOTE: DFS may not work well in this setup- need a map with paths
