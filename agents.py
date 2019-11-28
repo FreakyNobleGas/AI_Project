@@ -32,13 +32,17 @@ class agent(pygame.sprite.Sprite):
 		self.spriteR = 20 * self.sScale
 		self.com_mag = None
 		_algorithm = c_alg
+		self.facing = 0
 
 
 		# TODO: Add vield of vision / direction facing variables
 
 		# TODO: Add functionality for map to decide where agents start
 		if self.agent_pos == None:
-			self.agent_pos = [1,1]#[random.randrange(5,gameWindow[0]-5,1),random.randrange(5,gameWindow[1]-5,1)]
+			if self.role == "runner":
+				self.agent_pos = [1,1]#[random.randrange(5,gameWindow[0]-5,1),random.randrange(5,gameWindow[1]-5,1)]
+			else:
+				self.agent_pos = [10,10]
 
 		# Create sprite image based on location and dimensions
 		self.rect = pygame.Rect(self.agent_pos[0],self.agent_pos[1], self.spriteR, self.spriteR)
@@ -58,7 +62,7 @@ class agent(pygame.sprite.Sprite):
 			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list)
 		else:
 			print("Using generic algorithms.")
-			self.algorithm = algorithms.genericAlgorithms(self.agent_pos, self.c_map)
+			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map)
 
 		# Assign Image
 		print("Role: ", self.role)
@@ -84,6 +88,7 @@ class agent(pygame.sprite.Sprite):
 		#self.agent_pos = self.algorithm.move()
 		# Possible way of doing persistant commands by checking for existing commands in the object.
 		if not self.com_mag:
+			#print("self.agentpos",self.agent_pos)
 			move_result = self.algorithm.move(self.agent_pos)
 		# If move_result is a list of tupples set self.com_mag
 			if isinstance(move_result, list):
@@ -92,7 +97,11 @@ class agent(pygame.sprite.Sprite):
 				self.facing = first_result[1]
 				move_result.pop(0)
 				self.com_mag = move_result
-			else:	
+			elif move_result == None:
+				#no moves, do nothing
+				None
+			else:
+				#print("MR: ",move_result)
 				self.agent_pos = move_result[0]
 				self.facing = move_result[1]
 		else:
@@ -111,7 +120,7 @@ class agent(pygame.sprite.Sprite):
 		screen.blit(rotated_image, self.rect)
 
 	def getPos(self):
-		return self.agent_pos
+		return (self.agent_pos[0],self.agent_pos[1])
 	
 	def getType(self):
 		return self.role
@@ -123,7 +132,8 @@ class agent(pygame.sprite.Sprite):
 		if self.role is 'hunter':
 			# Hunter criteria
 			for runner in runners:
-				if postion is runner.getPos():
+				#print("p: ",position," GP: ", runner.getPos())
+				if position is runner.getPos():
 					return True
 					
 		elif self.role is 'runner':
@@ -134,4 +144,3 @@ class agent(pygame.sprite.Sprite):
 		# Return False fallthrough
 		return False
 			
-	

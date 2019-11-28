@@ -52,7 +52,7 @@ class genericAlgorithms(baseAlgorithm):
 		#self.wallList.expand(c_map.get_walls())
 		self.facing = 0 
 
-	def move(self):
+	def move(self,unusedPos = None):
 		d = (random.randrange(0,3,1)) 
 		# Increase the max to decrease odds of turning
 		if d == 0: # turn Left
@@ -117,7 +117,7 @@ class testAlgorithm(baseAlgorithm):
 		self.agent_list = c_agent_list
 		#print("Ag: ",self.agent_list)
 		
-	def move(self):
+	def move(self,unusedPos=None):
 		# get best direction from current position
 		# then step in that direction
 		newPos = self.bestDir(self.agent_pos, 5) # 
@@ -168,7 +168,7 @@ class testAlgorithm(baseAlgorithm):
 			if ((pList[i][1]) < bestVal):
 				bestVal = pList[i][1]
 				bestIndex = i
-		print("PL ", pList, " BI ", pList[bestIndex])
+		#print("PL ", pList, " BI ", pList[bestIndex])
 		return pList[bestIndex][0]
 				
 class DFS:
