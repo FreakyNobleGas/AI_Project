@@ -23,7 +23,7 @@ class agent(pygame.sprite.Sprite):
 		self.agent_pos = _current_pos
 		self.c_map = c_map
 		# TODO: Need to discuss agent list.
-		self.c_agent_list = c_agent_list 
+		self.c_agent_list = c_agent_list
 		self.c_alg = c_alg
 		self.role = _role
 		self.image = _image
@@ -36,7 +36,6 @@ class agent(pygame.sprite.Sprite):
 		self.rand = _rand
 		self.lIndex = _index
 		print("lInd- ",_index)
-
 
 		# TODO: Add vield of vision / direction facing variables
 
@@ -65,7 +64,7 @@ class agent(pygame.sprite.Sprite):
 			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
 		elif _algorithm == "test":
 			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
-		
+
 		else:
 			print("Using generic algorithms.")
 			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map)
@@ -127,12 +126,15 @@ class agent(pygame.sprite.Sprite):
 
 	def getPos(self):
 		return (self.agent_pos[0],self.agent_pos[1])
-	
+
 	def getType(self):
 		return self.role
-		
-	def isGoal(self, position):
-		hunters = [agent for agent in self.agents if agent.role is 'hunter']
+
+	def isGoal(self, position, hunter_flag=False):
+		# Added this code just to satisfy minmax dependency since DFS and BFS do not work with
+		# hunters enabled at this time
+		if hunter_flag:
+			hunters = [agent for agent in self.agents if agent.role is 'hunter']
 		runners = [agent for agent in self.c_agent_list if agent.role is 'runner']
 		# Check for role of agent then return true based on criteria
 		if self.role is 'hunter':
@@ -141,12 +143,11 @@ class agent(pygame.sprite.Sprite):
 				#print("p: ",position," GP: ", runner.getPos())
 				if position is runner.getPos():
 					return True
-					
+
 		elif self.role is 'runner':
 			# Runner criteria
 			if position in self.c_map.get_safezone():
 				return True
-				
+
 		# Return False fallthrough
 		return False
-			

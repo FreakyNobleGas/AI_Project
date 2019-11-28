@@ -24,8 +24,8 @@ class Driver:
     """
     Class that is used to run the program and contains all the game elements.
     """
-    def __init__(self, test=False, _map=None, agents={}, algorithm=None):
-        self.map = _map
+    def __init__(self, test=False, map=None, agents={}, algorithm=None):
+        self.map = map
         self.agents = agents
         self.algorithm = algorithm
 
@@ -60,7 +60,7 @@ class Driver:
     def run_game(self, c_map, c_agents, c_alg):
         newMap, wallList, agentList = self.formatter(c_map, c_agents, c_alg)
         gameEngine(agentList, wallList, newMap)
-        
+
 
 
 if __name__ == "__main__":
