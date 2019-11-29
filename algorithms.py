@@ -10,6 +10,14 @@
 ###########################################################################
 import random
 
+class worldState:
+	def __init__(self, agentPositions):
+		self.agentPositions = agentPositions
+		
+	def nextState(self, move, agent):
+		self.agentPositions[agent] = move
+		return worldState(self.agentPositions)
+
 class baseAlgorithm:
 	def __init__(self, agent_pos, c_map, agent_list = None, listIndex = None):
 		self.agent_pos = (agent_pos[0],agent_pos[1])
@@ -382,7 +390,7 @@ class Astar:
 		pass
 
 class MinMax:
-	def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
+	def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list
@@ -390,9 +398,10 @@ class MinMax:
 		self.depth = 2
 
 	def move(self):
-		self.minmax()
+		agent_pos_list = [agent.getPos() for agent in self.agents]
+		self.minmax(worldState(agent_pos_list, self.c_map))
 
-	def minmax(self):
+	def minmax(self, worldState):
 		def get_min(agent_pos_list, cur_depth, cur_agent):
 			max_successors = []
 
@@ -409,7 +418,7 @@ class MinMax:
 			actions = self.c_map.get_next(agent_pos_list[cur_agent])
 
 			for action in actions:
-				agent_pos_list[cur_agent] = action
+				successor = worldState.nextState()
 				min_successors.append(mm_driver(agent_pos_list, current_depth, current_agent + 1))
 
 			return max(min_successors)
@@ -420,7 +429,7 @@ class MinMax:
 				current_depth += 1
 
 			if (current_depth >= self.depth):
-				# Add state scoring
+				# TODO: Add state scoring
 				return "SCORE STATES"
 
 			#if current_agent is calling agent:
