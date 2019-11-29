@@ -13,7 +13,7 @@ import random
 class worldState:
 	def __init__(self, agentPositions):
 		self.agentPositions = agentPositions
-		
+
 	def nextState(self, move, agent):
 		self.agentPositions[agent] = move
 		return worldState(self.agentPositions)
@@ -398,35 +398,42 @@ class MinMax:
 		self.depth = 2
 
 	def move(self):
+		# Creates list of all agent positions for worldState
 		agent_pos_list = [agent.getPos() for agent in self.agents]
 		self.minmax(worldState(agent_pos_list, self.c_map))
 
 	def minmax(self, worldState):
-		def get_min(agent_pos_list, cur_depth, cur_agent):
+		def get_min(agent_pos_list, current_depth, current_agent):
 			max_successors = []
 
-			actions = self.c_map.get_next(agent_pos_list[cur_agent])
+			actions = self.c_map.get_next(agent_pos_list[current_agent])
 
 			for action in actions:
-				agent_pos_list[cur_agent] = action
-				max_successors.append(mm_driver(agent_pos_list, current_depth, current_agent + 1))
+				successor = worldState.nextState(action, cur_agent)
+				max_successors.append(helper(agent_pos_list, current_depth, current_agent + 1))
+
+			# Might need to add code for when no actions are available
+
+			return min(max_successors)
 
 
-		def get_max(agent_pos_list, cur_depth, cur_agent):
+		def get_max(agent_pos_list, current_depth, current_agent):
 			min_successors = []
 
-			actions = self.c_map.get_next(agent_pos_list[cur_agent])
+			actions = self.c_map.get_next(agent_pos_list[current_agent])
 
 			for action in actions:
-				successor = worldState.nextState()
-				min_successors.append(mm_driver(agent_pos_list, current_depth, current_agent + 1))
+				successor = worldState.nextState(action, current_agent)
+				min_successors.append(helper(agent_pos_list, current_depth, current_agent + 1))
+
+			# Might need to add code for when no actions are available
 
 			return max(min_successors)
 
-		def mm_driver(agent_pos_list, current_depth, current_agent):
+		def helper(agent_pos_list, current_depth, current_agent):
 
-			if current_agent is len(c_agent_list):
-				current_depth += 1
+			#if current_agent is len(c_agent_list):
+			current_depth += 1
 
 			if (current_depth >= self.depth):
 				# TODO: Add state scoring
