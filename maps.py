@@ -108,5 +108,6 @@ class Map():
 		for move, direction in next_moves:
 			 if self.out_of_bounds(move):
 				 valid_moves.append((move, direction))
+		#print("Valid Moves: ", valid_moves)
 
 		return valid_moves

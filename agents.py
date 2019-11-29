@@ -50,19 +50,19 @@ class agent(pygame.sprite.Sprite):
 		self.rect = pygame.Rect(self.agent_pos[0],self.agent_pos[1], self.spriteR, self.spriteR)
 
 		# Assign Agent Algorithm
-		if _algorithm == "DFS":
+		if _algorithm.lower() == "dfs":
 			self.algorithm = DFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
-		elif _algorithm == "BFS":
+		elif _algorithm.lower() == "bfs":
 			self.algorithm = BFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
-		elif _algorithm == "Astar":
+		elif _algorithm.lower() == "astar":
 			self.algorithm = Astar(self.agent_pos, self.c_map, self.lIndex)
-		elif _algorithm == "MinMax":
+		elif _algorithm.lower() == "minmax":
 			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
-		elif _algorithm == "ExpMax":
+		elif _algorithm.lower() == "expmax":
 			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.lIndex)
-		elif _algorithm == "Reflex":
+		elif _algorithm.lower() == "reflex":
 			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
-		elif _algorithm == "test":
+		elif _algorithm.lower() == "test":
 			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
 
 		else:
@@ -95,6 +95,7 @@ class agent(pygame.sprite.Sprite):
 		if not self.com_mag:
 			#print("self.agentpos",self.agent_pos)
 			move_result = self.algorithm.move(self.agent_pos)
+			print("Move result: ", move_result)
 		# If move_result is a list of tupples set self.com_mag
 			if isinstance(move_result, list):
 				first_result = move_result[0]
