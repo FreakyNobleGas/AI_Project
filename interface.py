@@ -49,21 +49,25 @@ class mainWindow(QMainWindow):
     def createButtons(self, tempLayout):
 
         NewGameButton = QPushButton("New Game", self)
+        NewGameButton.setStyleSheet("background-color:rgb(50, 168, 82)")
         NewGameButton.clicked.connect(self.newGame)
         NewGameButton.resize(600, 100)
         NewGameButton.move(100, 100)
-        
+
         RunButton = QPushButton("Run Game", self)
+        RunButton.setStyleSheet("background-color:rgb(69, 120, 222)")
         RunButton.clicked.connect(self.runGame)
         RunButton.resize(600, 100)
         RunButton.move(100, 210)
 
         HelpButton = QPushButton("Help", self)
+        HelpButton.setStyleSheet("background-color:rgb(255, 239, 0)")
         HelpButton.clicked.connect(self.help)
         HelpButton.resize(600, 100)
         HelpButton.move(100, 310)
 
         QuitButton = QPushButton("Quit", self)
+        QuitButton.setStyleSheet("background-color:rgb(219, 15, 15)")
         QuitButton.clicked.connect(QCoreApplication.instance().quit)
         QuitButton.resize(600,100)
         QuitButton.move(100, 410)
@@ -77,7 +81,7 @@ class mainWindow(QMainWindow):
 
     def newGame(self):
         self.new_game = NewGameSettings(self)
-        
+
     def runGame(self):
         if not self.new_game:
             print("New game not started")
@@ -104,7 +108,7 @@ class mainWindow(QMainWindow):
         msg.setIcon(QMessageBox.Information)
         msg.setText("TODO: Add code for help functionality")
         msg.exec_()
-    
+
 class NewGameSettings(QMainWindow):
     def __init__(self, parent=None):
         super(NewGameSettings, self).__init__(parent)
@@ -118,44 +122,44 @@ class NewGameSettings(QMainWindow):
         self.s_alg = None
         self.alg_text = ''
         self.initUi()
-        
+
     def initUi(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.right, self.width, self.height)
         self.menu = QVBoxLayout()
         self.menu = self.newGameButtons(self.menu)
         self.show()
-        
+
     def newGameButtons(self, layout):
         buffer_len = 100
-        
+
         self.SetMapButton = QPushButton("Choose Map", self)
         self.SetMapButton.clicked.connect(self.mapSelect)
         self.SetMapButton.resize((len("Choose Map") * 10), 100)
         self.SetMapButton.move(buffer_len, 100)
         buffer_len += 10 + (len("Choose Map") * 10)
-        
+
         self.SetAgentsButton = QPushButton("Set Agent Settings", self)
         self.SetAgentsButton.clicked.connect(self.agentSelect)
         self.SetAgentsButton.resize(len("Set Agent Settings") * 10, 100)
         self.SetAgentsButton.move(buffer_len, 100)
         buffer_len += 10 + (len("Set Agent Settings") * 10)
-        
+
         self.SetAlgorithmButton = QPushButton("Select Algorithm", self)
         self.SetAlgorithmButton.clicked.connect(self.algSelect)
         self.SetAlgorithmButton.resize((len("Set Agent Settings") * 10), 100)
         self.SetAlgorithmButton.move(buffer_len, 100)
-        
+
         self.N_G_Done = QPushButton("Done", self)
         self.N_G_Done.clicked.connect(self.n_g_done)
         self.N_G_Done.resize(400, 100)
         self.N_G_Done.move(100, 400)
-        
+
         layout.addWidget(self.SetMapButton)
         layout.addWidget(self.SetAgentsButton)
         layout.addWidget(self.SetAlgorithmButton)
         layout.addWidget(self.N_G_Done)
-    
+
     def mapSelect(self):
         print("Map select")
         sel_map = FileMenu()
@@ -165,15 +169,15 @@ class NewGameSettings(QMainWindow):
             self.s_map = sel_map.selected_file
         else:
             print("Map not selected: Add dailogbox to inform user", sel_map.selected_file)
-        
+
     def agentSelect(self):
         print("Agent select")
         self.sel_agents = AgentSelect()
-        
+
     def algSelect(self):
         print("Algorithm select")
         self.sel_alg = AlgSelect(self.SetAlgorithmButton)
-        
+
     def n_g_done(self):
         if not self.sel_alg.getAlg() or not self.sel_agents.getAgents() or not self.s_map:
             print("Returned with no Values")
@@ -182,7 +186,7 @@ class NewGameSettings(QMainWindow):
             self.s_alg = self.sel_alg.getAlg()
             self.agent_list = self.sel_agents.getAgents()
             self.close()
-        
+
 class AgentSelect(QMainWindow):
     def __init__(self, parent=None):
         super(AgentSelect, self).__init__(parent)
@@ -193,50 +197,50 @@ class AgentSelect(QMainWindow):
         self.title = 'Select Agents'
         self.agent_dict = {'hunter':0, 'runner':0}
         self.initUi()
-        
+
     def initUi(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.right, self.width, self.height)
         self.menu = QVBoxLayout()
         self.menu = self.AgentButtons(self.menu)
         self.show()
-        
+
     def AgentButtons(self, layout):
         self.AddHunter = QPushButton("Add Hunter", self)
         self.AddHunter.clicked.connect(lambda: self.addAgent("hunter"))
         self.AddHunter.resize(len("Add Hunter") * 10, 100)
         self.AddHunter.move(100, 100)
-        
+
         self.AddRunner = QPushButton("Add Runner", self)
         self.AddRunner.clicked.connect(lambda: self.addAgent("runner"))
         self.AddRunner.resize(len("Add Runner") * 10, 100)
         self.AddRunner.move(100, 250)
-        
+
         self.DeleteHunter = QPushButton("Delete Hunter", self)
         self.DeleteHunter.clicked.connect(lambda: self.delAgent("hunter"))
         self.DeleteHunter.resize(len("Delete Hunter") * 10, 100)
         self.DeleteHunter.move(200, 100)
-        
+
         self.DeleteRunner = QPushButton("Delete Runner", self)
         self.DeleteRunner.clicked.connect(lambda: self.delAgent("runner"))
         self.DeleteRunner.resize(len("Delete Runner") * 10, 100)
         self.DeleteRunner.move(200, 250)
-        
+
         self.A_B_Done = QPushButton("Done", self)
         self.A_B_Done.clicked.connect(self.close)
         self.A_B_Done.resize(600, 100)
         self.A_B_Done.move(100, 400)
-        
+
         self.HunterLabel = QLabel(self)
         self.HunterLabel.setAlignment(Qt.AlignCenter)
         self.HunterLabel.setText("Hunters: 0")
         self.HunterLabel.move(400,100)
-        
+
         self.RunnerLabel = QLabel(self)
         self.RunnerLabel.setAlignment(Qt.AlignCenter)
         self.RunnerLabel.setText("Runners: 0")
         self.RunnerLabel.move(400,250)
-        
+
         layout.addWidget(self.AddHunter)
         layout.addWidget(self.AddRunner)
         layout.addWidget(self.DeleteHunter)
@@ -244,35 +248,35 @@ class AgentSelect(QMainWindow):
         layout.addWidget(self.A_B_Done)
         layout.addWidget(self.HunterLabel)
         layout.addWidget(self.RunnerLabel)
-            
+
     def addAgent(self, agent):
         self.agent_dict[agent] += 1
         self.HunterLabel.setText("Hunters: " + str(self.agent_dict['hunter']))
         self.RunnerLabel.setText("Runners: " + str(self.agent_dict['runner']))
-        
+
         #if agent is 'Hunter':
         #    self.agent_list[agent]
         #    self.HunterLabel.setText("Hunters: " + str(len(self.hunter_list)))
         #elif agent is 'Runner':
         #    self.runner_list.append(Runner())
         #    self.RunnerLabel.setText("Runners: " + str(len(self.runner_list)))
-            
+
     def delAgent(self, agent):
         if self.agent_dict[agent] is not 0:
             self.agent_dict[agent] -= 1
             self.HunterLabel.setText("Hunters: " + str(self.agent_dict['hunter']))
             self.RunnerLabel.setText("Runners: " + str(self.agent_dict['runner']))
-        
+
         #if agent is 'Hunter' and len(self.hunter_list) != 0:
         #    self.hunter_list.pop(-1)
         #    self.HunterLabel.setText("Hunters: " + str(len(self.hunter_list)))
         #elif agent is 'Runner' and len(self.runner_list) != 0:
         #    self.runner_list.pop(-1)
         #    self.RunnerLabel.setText("Runners: " + str(len(self.runner_list)))
-            
+
     def getAgents(self):
         return self.agent_dict
-        
+
 class FileMenu(QWidget):
     def __init__(self):
         super().__init__()
@@ -283,26 +287,26 @@ class FileMenu(QWidget):
         self.height = 480
         self.selected_file = ''
         self.initUI()
-    
+
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        
+
         self.openFileNameDialog()
-        
+
         self.show()
-    
+
     def openFileNameDialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self, 
+        fileName, _ = QFileDialog.getOpenFileName(self,
             "Map Select",
             "",
             "All Files (*);;Python Files (*.py)",
             options=options)
         if fileName:
             self.selected_file = fileName
-            
+
 class AlgSelect(QMainWindow):
     def __init__(self, obj):
         super(AlgSelect, self).__init__()
@@ -314,18 +318,18 @@ class AlgSelect(QMainWindow):
         self.alg = None
         self.obj = obj
         self.initUi()
-        
+
     def initUi(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.right, self.width, self.height)
         self.menu = QVBoxLayout()
         self.menu = self.AlgButtons(self.menu)
         self.show()
-    
+
     def AlgButtons(self, layout):
         def name_len(name):
             return (len(name) * 10) + (100 - (len(name) * 10))
-        
+
         buffer_len = 100
         dist_len = 0
         self.DFSButton = QPushButton("DFS", self)
@@ -333,19 +337,19 @@ class AlgSelect(QMainWindow):
         self.DFSButton.resize(name_len("DFS"), 100)
         self.DFSButton.move(buffer_len, 100 + dist_len)
         buffer_len += 10 + name_len("DFS")
-        
+
         self.BFSButton = QPushButton("BFS", self)
         self.BFSButton.clicked.connect(lambda: self.selectAlg("BFS"))
         self.BFSButton.resize(name_len("BFS"), 100)
         self.BFSButton.move(buffer_len, 100 + dist_len)
         buffer_len += 10 + name_len("BFS")
-        
+
         self.AStarButton = QPushButton("A*", self)
         self.AStarButton.clicked.connect(lambda: self.selectAlg("A*"))
         self.AStarButton.resize(name_len("A*"), 100)
         self.AStarButton.move(buffer_len, 100 + dist_len)
         buffer_len += 10 + name_len("A*")
-        
+
         buffer_len = 100
         dist_len = 100
         self.MinMaxButton = QPushButton("Min Max", self)
@@ -353,31 +357,30 @@ class AlgSelect(QMainWindow):
         self.MinMaxButton.resize(name_len("Min Max"), 100)
         self.MinMaxButton.move(buffer_len, 100 + dist_len)
         buffer_len += 10 + name_len("Min Max")
-        
+
         self.ExpMaxButton = QPushButton("Expected Max", self)
         self.ExpMaxButton.clicked.connect(lambda: self.selectAlg("Expected Max"))
         self.ExpMaxButton.resize(name_len("Expected Max"), 100)
         self.ExpMaxButton.move(buffer_len, 100 + dist_len)
-        
+
         self.Al_Done = QPushButton("Done", self)
         self.Al_Done.clicked.connect(self.close)
         self.Al_Done.resize(400, 100)
         self.Al_Done.move(100, 400)
-        
+
         layout.addWidget(self.DFSButton)
         layout.addWidget(self.BFSButton)
         layout.addWidget(self.AStarButton)
         layout.addWidget(self.MinMaxButton)
         layout.addWidget(self.ExpMaxButton)
         layout.addWidget(self.Al_Done)
-    
+
     def selectAlg(self, selected_alg):
         self.obj.setText(selected_alg)
         if selected_alg:
             self.alg = selected_alg
         else:
             print("NO ALGORITHM")
-            
+
     def getAlg(self):
         return self.alg
-            
