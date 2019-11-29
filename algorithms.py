@@ -14,9 +14,12 @@ class worldState:
 	def __init__(self, agentPositions):
 		self.agentPositions = agentPositions
 
-	def nextState(self, move, agent):
-		self.agentPositions[agent] = move
+	def nextState(self, action, agent):
+		self.agentPositions[agent] = action
 		return worldState(self.agentPositions)
+		
+	def curPos(self, agent):
+		return self.agentPositions[agent]
 
 class baseAlgorithm:
 	def __init__(self, agent_pos, c_map, agent_list = None, listIndex = None):
@@ -176,7 +179,7 @@ class testAlgorithm(baseAlgorithm):
 			if ((pList[i][1]) < bestVal):
 				bestVal = pList[i][1]
 				bestIndex = i
-		#print("PL ", pList, " BI ", pList[bestIndex])
+		#print("PL ", pLis7t, " BI ", pList[bestIndex])
 		return pList[bestIndex][0]
 
 
@@ -390,66 +393,70 @@ class Astar:
 		pass
 
 class MinMax:
+	# TODO: Ensure that game engine moves agents in the same way as minmax.
 	def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list
 		self.lIndex = listIndex
 		self.depth = 2
+		self.runner_list = [agent for agent in self.c_agentList if agent.getType() is 'runner']
+		self.hunter_list = [agent for agent in self.c_agentList if agent.getType() is 'hunter']
 
+	def setup(self):
+		self.new_list = self.agents[self.lIndex]
+		self.indexAgentType = self.new_list[0].getType()
+		self.new_list.append([agent for agent in self.agents if agent.getType() is self.indexAgentType and agent is not self.agents[self.lIndex]])
+		self.new_list.append([agent for agent in self.agents if agent.getType() is not self.indexAgentType])
+	
 	def move(self, agent_pos):
 		# Creates list of all agent positions for worldState
-		agent_pos_list = [agent.getPos() for agent in self.agents]
+		agent_pos_list = [agent.getPos() for agent in self.new_list]
 		self.minmax(worldState(agent_pos_list))
 
 	def minmax(self, worldState):
-		def get_min(agent_pos_list, current_depth, current_agent):
+		def get_min(worldState, current_depth, current_agent):
 			max_successors = []
 
-			actions = self.c_map.get_next(agent_pos_list[current_agent])
+			actions = self.c_map.get_next(worldState.curPos(current_agent))
 
 			for action in actions:
-				successor = worldState.nextState(action, cur_agent)
-				max_successors.append(helper(agent_pos_list, current_depth, current_agent + 1))
+				successor = worldState.nextState(action, current_agent)
+				max_successors.append(helper(successor, current_depth, current_agent + 1))
 
 			# Might need to add code for when no actions are available
 
 			return min(max_successors)
 
 
-		def get_max(agent_pos_list, current_depth, current_agent):
+		def get_max(worldState, current_depth, current_agent):
 			min_successors = []
 
-			actions = self.c_map.get_next(agent_pos_list[current_agent])
+			actions = self.c_map.get_next(worldState.curPos(current_agent))
 
 			for action in actions:
 				successor = worldState.nextState(action, current_agent)
-				min_successors.append(helper(agent_pos_list, current_depth, current_agent + 1))
+				min_successors.append(helper(successor, current_depth, current_agent + 1))
 
 			# Might need to add code for when no actions are available
 
 			return max(min_successors)
 
-		def helper(agent_pos_list, current_depth, current_agent):
-			#print("current_agent = ", current_agent)
-			#print("len(c_agent_list) = ", len(c_agent_list))
-			#exit()
-			#if current_agent is len(c_agent_list):
-			current_depth += 1
-
+		def helper(worldState, current_depth, current_agent):
+			if current_agent is len(self.new_list):
+				current_depth += 1
+				current_agent = 0
+	
 			if (current_depth >= self.depth):
 				# TODO: Add state scoring
 				return "SCORE STATES"
-
-			#if current_agent is calling agent:
-			#	return get_max(agent_pos_list, current_depth, current_agent)
-
-		agent_pos_list = [agent.getPos() for agent in self.agents]
-		#print("agent_pos_list = ", agent_pos_list)
-		#print("self.agents = ", self.agents)
-		#print("current_pos = ", self.current_pos)
-		#exit()
-		best_score = helper(agent_pos_list, 0, self.current_pos)
+	
+			if self.new_list[current_agent].getType() is self.indexAgentType:
+				return get_max(worldState, current_depth, current_agent)
+			else:
+				return get_min(worldState, current_depth, current_agent)
+		
+		best_score = helper(worldState, 0, 0)
 		return best_score
 
 class ExpMax:
