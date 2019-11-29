@@ -237,8 +237,13 @@ class Reflex(baseAlgorithm):
 			for agent in self.agent_list:
 				# find closest agent's distance
 				agentVal = self.manhattanDistance(pList[i][0], agent.getPos())
-				#if (agentVal < bestVal) and not(agent.getType() == "hunter"): # old hardcoded check
-				if (agentVal < bestVal) and not(agent.getType() == self.agent_list[self.lIndex].getType()):
+				
+				if (agentVal <=1)and not(agent.getType() == self.agent_list[self.lIndex].getType()):
+					agent.kill()
+					# this kills off a tagged runner
+					# can also add a gameType conditional, to change them to hunters
+				
+				elif (agentVal < bestVal) and not(agent.getType() == self.agent_list[self.lIndex].getType()):
 					# NOTE: this is currently set as a dedicated hunter-only
 					# algorithm.  only works for hunters chasing runners
 					# (to avoid chasing itself and not moving)
@@ -394,14 +399,14 @@ class Astar:
 	def __init__(self):
 		pass
 
-class MinMax:
+class MinMax(baseAlgorithm):
 	# TODO: Ensure that game engine moves agents in the same way as minmax.
 	def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list
 		self.lIndex = listIndex
-		self.depth = 2
+		self.depth = 3
 		#self.runner_list = [agent for agent in self.c_agentList if agent.getType() is 'runner']
 		#self.hunter_list = [agent for agent in self.c_agentList if agent.getType() is 'hunter']
 
