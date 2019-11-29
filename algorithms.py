@@ -397,10 +397,10 @@ class MinMax:
 		self.lIndex = listIndex
 		self.depth = 2
 
-	def move(self):
+	def move(self, agent_pos):
 		# Creates list of all agent positions for worldState
 		agent_pos_list = [agent.getPos() for agent in self.agents]
-		self.minmax(worldState(agent_pos_list, self.c_map))
+		self.minmax(worldState(agent_pos_list))
 
 	def minmax(self, worldState):
 		def get_min(agent_pos_list, current_depth, current_agent):
@@ -431,7 +431,9 @@ class MinMax:
 			return max(min_successors)
 
 		def helper(agent_pos_list, current_depth, current_agent):
-
+			#print("current_agent = ", current_agent)
+			#print("len(c_agent_list) = ", len(c_agent_list))
+			#exit()
 			#if current_agent is len(c_agent_list):
 			current_depth += 1
 
@@ -441,6 +443,15 @@ class MinMax:
 
 			#if current_agent is calling agent:
 			#	return get_max(agent_pos_list, current_depth, current_agent)
+
+		agent_pos_list = [agent.getPos() for agent in self.agents]
+		#print("agent_pos_list = ", agent_pos_list)
+		#print("self.agents = ", self.agents)
+		#print("current_pos = ", self.current_pos)
+		#exit()
+		best_score = helper(agent_pos_list, 0, self.current_pos)
+		return best_score
+
 class ExpMax:
 	def __init__(self):
 		pass

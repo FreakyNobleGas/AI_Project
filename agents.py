@@ -57,7 +57,7 @@ class agent(pygame.sprite.Sprite):
 		elif _algorithm == "Astar":
 			self.algorithm = Astar(self.agent_pos, self.c_map, self.lIndex)
 		elif _algorithm == "MinMax":
-			self.algorithm = MinMax(self.agent_pos, self.c_map, self.lIndex)
+			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 		elif _algorithm == "ExpMax":
 			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.lIndex)
 		elif _algorithm == "Reflex":
