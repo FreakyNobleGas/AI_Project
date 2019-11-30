@@ -117,9 +117,6 @@ class gameEngine():
 				return False
 		return True
 
-	def manhattanDistance():
-		None#Foo.
-
 
 
 class tempGetMap():

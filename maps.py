@@ -20,6 +20,8 @@ class Map():
 		self.safe_zone = []
 		self.walls = []
 		self.map_bounds = []
+		self.hunter_spawn = []
+		self.runner_spawn = []
 		self.x_bound = None
 		self.y_bound = None
 		self.map_name = map_name
@@ -61,6 +63,10 @@ class Map():
 					self.walls.append((x_coord, y_coord))
 				elif m_asset is 'S':
 					self.safe_zone.append((x_coord, y_coord))
+				elif m_asset is 'R':
+					self.runner_spawn.append((x_coord, y_coord))
+				elif m_asset is 'H':
+					self.hunter_spawn.append((x_coord, y_coord))
 				x_coord += 1
 			if not h_flag:
 				y_coord += 1
@@ -72,6 +78,12 @@ class Map():
 
 	def get_walls(self):
 		return self.walls
+	
+	def get_hspawn(self):
+		return self.hunter_spawn
+	
+	def get_rspawn(self):
+		return self.runner_spawn
 
 	def out_of_bounds(self, move):
 		"""

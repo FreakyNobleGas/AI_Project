@@ -44,9 +44,12 @@ class agent(pygame.sprite.Sprite):
 		# TODO: Add functionality for map to decide where agents start
 		if self.agent_pos == None:
 			if self.role == "runner":
-				self.agent_pos = [1,1]#[random.randrange(5,gameWindow[0]-5,1),random.randrange(5,gameWindow[1]-5,1)]
+				#self.agent_pos = [1,1]#[random.randrange(5,gameWindow[0]-5,1),random.randrange(5,gameWindow[1]-5,1)]
+				posSpawn = c_map.get_rspawn()
 			else:
-				self.agent_pos = [10,10]
+				#self.agent_pos = [10,10]
+				posSpawn = c_map.get_hspawn()
+			self.agent_pos = posSpawn[random.randrange(0,len(posSpawn),1)]
 
 		# Create sprite image based on location and dimensions
 		self.rect = pygame.Rect(self.agent_pos[0],self.agent_pos[1], self.spriteR, self.spriteR)
