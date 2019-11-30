@@ -104,6 +104,7 @@ class gameEngine():
 				elif runnerCount == 0:
 					print("Hunters won!  No remaining Runners")
 					gameOver = 1
+			
 
 	def validMove(self,agentPos):
 		#this function, in this case, only checks if the proposed move is
@@ -192,7 +193,7 @@ if __name__ == "__main__":
 	agentList = []
 	wallList = []
 	#tempWalls = tempGetMap("maps/pacman.txt")
-	c_map = maps.Map("maps/test.txt")
+	c_map = maps.Map("maps/complex2.txt")
 	#c_map.get_map_assets()
 	c_agent_list = []
 	'''
@@ -207,10 +208,10 @@ if __name__ == "__main__":
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "test", _role ="hunter"))'''
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "DFS", _role ="runner", _index = (len(agentList))))
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="runner", _index = (len(agentList))))
-	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "MinMax", _role ="hunter",_rand=20, _index = (len(agentList))))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter",_rand=2, _index = (len(agentList))))
 	
-	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "DFS", _role ="runner", _index = (len(agentList))))
-	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "MinMax", _role ="hunter", _index = (len(agentList))))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role ="runner", _index = (len(agentList))))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role ="runner", _index = (len(agentList))))
 	
 	
 	#c_agent_list.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "test", _role ="hunter"))

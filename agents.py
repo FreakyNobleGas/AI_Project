@@ -37,6 +37,7 @@ class agent(pygame.sprite.Sprite):
 		self.lIndex = _index
 		self.totalEvalScore = 0.0
 		print("lInd- ",_index)
+		self.die = 0
 
 		# TODO: Add vield of vision / direction facing variables
 
@@ -102,6 +103,8 @@ class agent(pygame.sprite.Sprite):
 			if self.getType() == "hunter":
 				for a in self.c_agent_list:
 					if (a.getType() is not "hunter") and (1>= self.algorithm.manhattanDistance(self.getPos(),a.getPos())):
+						#self.c_agent_list.remove(a)
+						a.markForDeath()
 						a.kill()
 			
 		# If move_result is a list of tupples set self.com_mag
@@ -160,3 +163,9 @@ class agent(pygame.sprite.Sprite):
 
 		# Return False fallthrough
 		return False
+	def markForDeath(self):
+		self.die = 1
+		self.agent_pos = (-999999999,-999999999)
+		
+	def shouldDie(self):
+		return self.die
