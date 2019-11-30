@@ -10,6 +10,42 @@
 ###########################################################################
 import random
 
+# TODO: Create manhattan distance algorithm that accounts for walls
+class hunterEvalFunction:
+	# agentPositions holds a list of coordinates for each agent on the map
+	def __init__(self, listOfAgents, agentIndex):
+		self.agentType = listOfAgents[agentIndex].getType()
+		self.agentPos = listOfAgents[agentIndex].getPos()
+		self.listOfAgents = listOfAgents
+
+	def evaluate(self):
+		total = 0
+		total = [agents.algorithm.manhattanDistance(self.agentPos, agents.getPos())
+				for agents in self.listOfAgents if agents.getType() is not self.agentType]
+		total = min(total)
+
+		return total
+
+class runnerEvalFunction:
+	# agentPositions holds a list of coordinates for each agent on the map
+	def __init__(self, listOfAgents, agentIndex):
+		self.agent = listOfAgents[agentIndex]
+		self.agentType = self.agent.getType()
+		self.agentPos = self.agent.getPos()
+		self.listOfAgents = listOfAgents
+		self.safeZones = self.agent.algorithm.c_map.get_safezone()
+
+	def evaluate(self):
+		total = 0.0
+		total = [agents.algorithm.manhattanDistance(self.agentPos, agents.getPos())
+				for agents in self.listOfAgents if agents.getType() is not self.agentType]
+		total = min(total) * -1.0
+
+		totalSafeZone = [self.agent.algorithm.manhattanDistance(self.agentPos, coordinate) for coordinate in self.safeZones]
+		total += (sum(totalSafeZone) * 0.5)
+
+		return total
+
 class worldState:
 	def __init__(self, agentPositions):
 		self.agentPositions = agentPositions
@@ -18,7 +54,7 @@ class worldState:
 		#print("Action: ", action)
 		self.agentPositions[agent] = action
 		return worldState(self.agentPositions)
-		
+
 	def curPos(self, agent):
 		#print("Current pos for agent: ", self.agentPositions[agent])
 		return self.agentPositions[agent]
@@ -394,7 +430,7 @@ class Astar:
 	def __init__(self):
 		pass
 
-class MinMax:
+class MinMax(baseAlgorithm):
 	# TODO: Ensure that game engine moves agents in the same way as minmax.
 	def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
 		self.current_pos = agent_pos
@@ -410,7 +446,7 @@ class MinMax:
 		self.indexAgentType = self.new_list[0].getType()
 		self.new_list.extend([agent for agent in self.agents if agent.getType() is self.indexAgentType and agent is not self.agents[self.lIndex]])
 		self.new_list.extend([agent for agent in self.agents if agent.getType() is not self.indexAgentType])
-	
+
 	def move(self, agent_pos):
 		# Creates list of all agent positions for worldState
 		self.setup()
@@ -421,7 +457,7 @@ class MinMax:
 	def minmax(self, worldState):
 		def get_min(worldState, current_depth, current_agent):
 			max_successors = []
-			
+
 			#print("Current agent: ", current_agent)
 			actions = self.c_map.get_next(worldState.curPos(current_agent))
 
@@ -436,7 +472,7 @@ class MinMax:
 
 		def get_max(worldState, current_depth, current_agent):
 			min_successors = []
-			
+
 			#print("Current agent: ", current_agent)
 			actions = self.c_map.get_next(worldState.curPos(current_agent))
 
@@ -452,16 +488,19 @@ class MinMax:
 			if current_agent is len(self.new_list):
 				current_depth += 1
 				current_agent = 0
-	
+
 			if (current_depth >= self.depth):
 				# TODO: Add state scoring
-				return random.randrange(0,10,1)
-	
+				if self.new_list[current_agent].getType() is "runner":
+					return runnerEvalFunction(self.new_list, current_agent).evaluate()
+				else:
+					return hunterEvalFunction(self.new_list, current_agent).evaluate()
+
 			if self.new_list[current_agent].getType() is self.indexAgentType:
 				return get_max(worldState, current_depth, current_agent)
 			else:
 				return get_min(worldState, current_depth, current_agent)
-		
+
 		best_score = helper(worldState, 0, 0)
 		print(best_score)
 		return best_score[1]
