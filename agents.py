@@ -97,6 +97,13 @@ class agent(pygame.sprite.Sprite):
 			#print("self.agentpos",self.agent_pos)
 			move_result = self.algorithm.move(self.agent_pos)
 			print("Move result: ", move_result)
+			
+			# kill or convert.  for now, kills on hunter tagging a runner
+			if self.getType() == "hunter":
+				for a in self.c_agent_list:
+					if (a.getType() is not "hunter") and (1>= self.algorithm.manhattanDistance(self.getPos(),a.getPos())):
+						a.kill()
+			
 		# If move_result is a list of tupples set self.com_mag
 			if isinstance(move_result, list):
 				first_result = move_result[0]
