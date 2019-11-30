@@ -35,6 +35,7 @@ class agent(pygame.sprite.Sprite):
 		self.facing = 0
 		self.rand = _rand
 		self.lIndex = _index
+		self.totalEvalScore = 0.0
 		print("lInd- ",_index)
 
 		# TODO: Add vield of vision / direction facing variables

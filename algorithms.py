@@ -28,23 +28,26 @@ class hunterEvalFunction:
 
 class runnerEvalFunction:
 	# agentPositions holds a list of coordinates for each agent on the map
-	def __init__(self, listOfAgents, agentIndex):
+	def __init__(self, listOfAgents, agentIndex, total=0):
 		self.agent = listOfAgents[agentIndex]
 		self.agentType = self.agent.getType()
 		self.agentPos = self.agent.getPos()
 		self.listOfAgents = listOfAgents
 		self.safeZones = self.agent.algorithm.c_map.get_safezone()
+		self.total = total
 
 	def evaluate(self):
-		total = 0.0
-		total = [agents.algorithm.manhattanDistance(self.agentPos, agents.getPos())
+		#print("1 = ", self.total)
+		self.total = [agents.algorithm.manhattanDistance(self.agentPos, agents.getPos())
 				for agents in self.listOfAgents if agents.getType() is not self.agentType]
-		total = min(total) * -1.0
+		self.total = min(self.total) * -1.0
 
 		totalSafeZone = [self.agent.algorithm.manhattanDistance(self.agentPos, coordinate) for coordinate in self.safeZones]
-		total += (sum(totalSafeZone) * 0.5)
+		self.total += (sum(totalSafeZone) * 0.5)
 
-		return total
+		self.total -= 15.0
+		#print("2 = ", self.total)
+		return self.total
 
 class worldState:
 	def __init__(self, agentPositions):
@@ -273,12 +276,12 @@ class Reflex(baseAlgorithm):
 			for agent in self.agent_list:
 				# find closest agent's distance
 				agentVal = self.manhattanDistance(pList[i][0], agent.getPos())
-				
+
 				if (agentVal <=1)and not(agent.getType() == self.agent_list[self.lIndex].getType()):
 					agent.kill()
 					# this kills off a tagged runner
 					# can also add a gameType conditional, to change them to hunters
-				
+
 				elif (agentVal < bestVal) and not(agent.getType() == self.agent_list[self.lIndex].getType()):
 					# NOTE: this is currently set as a dedicated hunter-only
 					# algorithm.  only works for hunters chasing runners
@@ -497,7 +500,8 @@ class MinMax(baseAlgorithm):
 			if (current_depth >= self.depth):
 				# TODO: Add state scoring
 				if self.new_list[current_agent].getType() is "runner":
-					return runnerEvalFunction(self.new_list, current_agent).evaluate()
+					self.new_list[current_agent].totalEvalScore = runnerEvalFunction(self.new_list, current_agent, self.new_list[current_agent].totalEvalScore).evaluate()
+					return self.new_list[current_agent].totalEvalScore
 				else:
 					return hunterEvalFunction(self.new_list, current_agent).evaluate()
 
