@@ -25,7 +25,7 @@ class mainWindow(QMainWindow):
         self.c_map = None
         self.c_agents = {}
         self.c_alg = None
-        self.new_game = None
+        self.new_game = NewGameSettings(self)
         # Required to start application
         app = QApplication([])
 
@@ -80,7 +80,8 @@ class mainWindow(QMainWindow):
         return tempLayout
 
     def newGame(self):
-        self.new_game = NewGameSettings(self)
+        super(NewGameSettings, self.new_game).__init__()
+        self.new_game.initUi()
 
     def runGame(self):
         if not self.new_game:
@@ -111,7 +112,7 @@ class mainWindow(QMainWindow):
 
 class NewGameSettings(QMainWindow):
     def __init__(self, parent=None):
-        super(NewGameSettings, self).__init__(parent)
+        #super(NewGameSettings, self).__init__(parent)
         self.left = 100
         self.right = 100
         self.width = 800
@@ -121,7 +122,8 @@ class NewGameSettings(QMainWindow):
         self.agent_list = {}
         self.s_alg = None
         self.alg_text = ''
-        self.initUi()
+        self.sel_agents = AgentSelect()
+        #self.initUi()
 
     def initUi(self):
         self.setWindowTitle(self.title)
@@ -172,7 +174,9 @@ class NewGameSettings(QMainWindow):
 
     def agentSelect(self):
         print("Agent select")
-        self.sel_agents = AgentSelect()
+        #self.sel_agents = AgentSelect()
+        super(AgentSelect, self.sel_agents).__init__()
+        self.sel_agents.initUi()
 
     def algSelect(self):
         print("Algorithm select")
@@ -189,14 +193,14 @@ class NewGameSettings(QMainWindow):
 
 class AgentSelect(QMainWindow):
     def __init__(self, parent=None):
-        super(AgentSelect, self).__init__(parent)
+        #super(AgentSelect, self).__init__(parent)
         self.left = 100
         self.right = 100
         self.width = 800
         self.height = 600
         self.title = 'Select Agents'
         self.agent_dict = {'hunter':0, 'runner':0}
-        self.initUi()
+        #self.initUi()
 
     def initUi(self):
         self.setWindowTitle(self.title)
@@ -233,12 +237,12 @@ class AgentSelect(QMainWindow):
 
         self.HunterLabel = QLabel(self)
         self.HunterLabel.setAlignment(Qt.AlignCenter)
-        self.HunterLabel.setText("Hunters: 0")
+        self.HunterLabel.setText("Hunters: " + str(self.agent_dict["hunter"]))
         self.HunterLabel.move(400,100)
 
         self.RunnerLabel = QLabel(self)
         self.RunnerLabel.setAlignment(Qt.AlignCenter)
-        self.RunnerLabel.setText("Runners: 0")
+        self.RunnerLabel.setText("Runners: " + str(self.agent_dict["runner"]))
         self.RunnerLabel.move(400,250)
 
         layout.addWidget(self.AddHunter)

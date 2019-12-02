@@ -16,7 +16,7 @@
 import argparse
 from os import path
 from interface import mainWindow
-from gameengine import gameEngine, wallTile
+from gameengine import gameEngine, wallTile, safeTile
 from maps import Map
 from agents import agent
 
@@ -50,16 +50,20 @@ class Driver:
         newMap = Map(c_map)
         # Generate list of wallTile objects based on coordinates from newMap
         wallList = [wallTile(i) for i in (newMap.get_walls()+newMap.get_map_bounds())]
+
+        # Generate a list with all safezones
+        safeList = [safeTile(i) for i in (newMap.get_safezone())]
+
         # Generate list of agent objects from dict c_agents
         for role, total in c_agents.items():
             for i in range(total):
                 agentList.append(agent(c_map=newMap, c_agent_list=agentList, c_alg=c_alg, _role=role, _index = len(agentList)))
 
-        return newMap, wallList, agentList
+        return newMap, wallList, agentList, safeList
 
     def run_game(self, c_map, c_agents, c_alg):
-        newMap, wallList, agentList = self.formatter(c_map, c_agents, c_alg)
-        gameEngine(agentList, wallList, newMap)
+        newMap, wallList, agentList, safeList = self.formatter(c_map, c_agents, c_alg)
+        gameEngine(agentList, wallList, newMap, safeList = safeList)
 
 
 
