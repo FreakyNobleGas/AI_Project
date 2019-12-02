@@ -9,21 +9,27 @@
 ###########################################################################
 ###########################################################################
 import random
+import math
 
 # TODO: Create manhattan distance algorithm that accounts for walls
 class hunterEvalFunction:
 	# agentPositions holds a list of coordinates for each agent on the map
 	def __init__(self, listOfAgents, agentIndex):
+		self.agentList = listOfAgents
+		self.index = agentIndex
 		self.agentType = listOfAgents[agentIndex].getType()
 		self.agentPos = listOfAgents[agentIndex].getPos()
 		self.listOfAgents = listOfAgents
+		
 
 	def evaluate(self):
+		#self.agentPos = self.agentList[self.index].getPos()
 		total = 0
 		total = [agents.algorithm.manhattanDistance(self.agentPos, agents.getPos())
-				for agents in self.listOfAgents if agents.getType() is not self.agentType]
+				for agents in self.listOfAgents if (agents.getType() is not self.agentType)]
+		print("Total list: ", total)		
 		total = min(total)
-
+		print("hunter Total: ", total)
 		return total
 
 class runnerEvalFunction:
@@ -47,6 +53,7 @@ class runnerEvalFunction:
 
 		self.total -= 15.0
 		#print("2 = ", self.total)
+		print("runner Toal: ", self.total)
 		return self.total
 
 class worldState:
@@ -82,6 +89,9 @@ class baseAlgorithm:
 		# If I understand it correctly, Manhattan Distance is the
 		# x-delta + y-delta
 		return (abs(pos1[0]-pos2[0])+abs(pos1[1]-pos2[1]))
+
+	def linDist(self,pos1,pos2):
+		return (math.sqrt((pos1[0]-pos2[0])**2 + (pos1[1]-pos2[1])**2))
 
 	def cardinalDir(self):
 		# will ultimately return the rough (N-S-E-W) direction to
@@ -275,17 +285,21 @@ class Reflex(baseAlgorithm):
 			bestVal = 99999999
 			for agent in self.agent_list:
 				# find closest agent's distance
-				agentVal = self.manhattanDistance(pList[i][0], agent.getPos())
+				agentVal = self.linDist(pList[i][0], agent.getPos())
 
+				''' old code, moved to agent.update() to make it universal
 				if (agentVal <=1)and not(agent.getType() == self.agent_list[self.lIndex].getType()):
 					agent.kill()
 					# this kills off a tagged runner
 					# can also add a gameType conditional, to change them to hunters
-
-				elif (agentVal < bestVal) and not(agent.getType() == self.agent_list[self.lIndex].getType()):
+				'''
+				if (agentVal < bestVal) and not(agent.getType() == "hunter"):#self.agent_list[self.lIndex].getType()):
 					# NOTE: this is currently set as a dedicated hunter-only
 					# algorithm.  only works for hunters chasing runners
 					# (to avoid chasing itself and not moving)
+					#
+					# SECONDARY: self.agent_list[self.lIndex].getType() 
+					# isn't working properly with two hunters.
 					bestVal = agentVal
 			pList[i] = ((pList[i][0]),bestVal)
 			# the above loop should find the closest agent to that position,
@@ -301,7 +315,7 @@ class Reflex(baseAlgorithm):
 		return pList[bestIndex][0]
 
 
-class DFS:
+class DFS(baseAlgorithm):
 	# NOTE: DFS may not work well in this setup- need a map with paths
 	# to be able to limit depth paths (and avoid looping)
 	def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
@@ -373,7 +387,7 @@ class DFS:
 					current_pos = path[-1][0]
 
 
-class BFS:
+class BFS(baseAlgorithm):
 	def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
 		self.current_pos = agent_pos
 		self.c_map = c_map
