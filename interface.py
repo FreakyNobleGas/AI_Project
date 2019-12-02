@@ -183,6 +183,7 @@ class NewGameSettings(QMainWindow):
 
         self.close()
 
+    # Update map selction after the user selects a new map in the drop down menu
     def updateMap(self):
         self.s_map = path.dirname(path.realpath(__file__)) + "/maps/" + str(self.mapDropDownMenu.currentText())
 
@@ -194,19 +195,22 @@ class NewGameSettings(QMainWindow):
         for f in mapFiles:
             self.mapDropDownMenu.addItem(f)
 
-        self.mapDropDownMenu.currentIndexChanged.connect(self.updateMap())
+        self.mapDropDownMenu.currentIndexChanged.connect(self.updateMap)
         self.mapDropDownMenu.resize(150, 50)
         self.mapDropDownMenu.move(250, 110)
 
-    def algorithMenu(self, layout):
+    def updateAlgorithm(self):
+        self.s_alg = str(self.algorithmDropDownMenu.currentText())
+        print("Alg = ", self.s_alg)
 
+    def algorithMenu(self, layout):
         self.algorithmDropDownMenu = QComboBox(self)
         self.algorithmDropDownMenu.addItem("DFS")
         self.algorithmDropDownMenu.addItem("BFS")
         self.algorithmDropDownMenu.addItem("A*")
         self.algorithmDropDownMenu.addItem("MinMax")
         self.algorithmDropDownMenu.addItem("ExpectiMax")
-        self.s_alg = str(self.algorithmDropDownMenu.currentText())
+        self.algorithmDropDownMenu.currentIndexChanged.connect(self.updateAlgorithm)
         self.algorithmDropDownMenu.move(250, 310)
 
     def AgentButtons(self, layout):

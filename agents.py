@@ -59,11 +59,11 @@ class agent(pygame.sprite.Sprite):
 			self.algorithm = DFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
 		elif _algorithm.lower() == "bfs":
 			self.algorithm = BFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "astar":
+		elif _algorithm.lower() == "astar" or _algorithm.lower() == "A*":
 			self.algorithm = Astar(self.agent_pos, self.c_map, self.lIndex)
 		elif _algorithm.lower() == "minmax":
 			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "expmax":
+		elif _algorithm.lower() == "expmax" or _algorithm.lower() == "expectimax":
 			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.lIndex)
 		elif _algorithm.lower() == "reflex":
 			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
@@ -82,7 +82,6 @@ class agent(pygame.sprite.Sprite):
 			self.image = pygame.image.load('./images/b-arrow-small.png')
 		else:
 			print("ERROR: AGENTS.PY - COULD NOT FIND IMAGE.")
-			#exit()
 			self.image = pygame.image.load('./images/waldo-small.png')
 
 		# Resize image for gameWindow
@@ -101,7 +100,7 @@ class agent(pygame.sprite.Sprite):
 			#print("self.agentpos",self.agent_pos)
 			move_result = self.algorithm.move(self.agent_pos)
 			print("Move result: ", move_result)
-			
+
 			# kill or convert.  for now, kills on hunter tagging a runner
 			if self.getType() == "hunter":
 				for a in self.c_agent_list:
@@ -109,7 +108,7 @@ class agent(pygame.sprite.Sprite):
 						#self.c_agent_list.remove(a)
 						a.markForDeath()
 						a.kill()
-			
+
 		# If move_result is a list of tupples set self.com_mag
 			if isinstance(move_result, list):
 				first_result = move_result[0]
@@ -150,6 +149,7 @@ class agent(pygame.sprite.Sprite):
 		# hunters enabled at this time
 		if hunter_flag:
 			hunters = [agent for agent in self.agents if agent.role is 'hunter']
+
 		runners = [agent for agent in self.c_agent_list if agent.role is 'runner']
 		# Check for role of agent then return true based on criteria
 		if self.role is 'hunter':
@@ -166,9 +166,10 @@ class agent(pygame.sprite.Sprite):
 
 		# Return False fallthrough
 		return False
+
 	def markForDeath(self):
 		self.die = 1
 		self.agent_pos = (-999999999,-999999999)
-		
+
 	def shouldDie(self):
 		return self.die
