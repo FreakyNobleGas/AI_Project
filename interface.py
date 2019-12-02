@@ -161,19 +161,15 @@ class NewGameSettings(QMainWindow):
         self.AlgorithmTitle.resize((len("Select Algorithm") * 10), 50)
         self.AlgorithmTitle.move(100, 300)
 
-        self.N_G_Done = QPushButton("Done", self)
-        self.N_G_Done.clicked.connect(self.n_g_done)
-        self.N_G_Done.resize(300, 100)
-        self.N_G_Done.move(400, 400)
+        self.doneButton = QPushButton("Save Game Settings", self)
+        self.doneButton.clicked.connect(self.new_game_done)
+        self.doneButton.resize(300, 100)
+        self.doneButton.move(225, 400)
 
-        layout.addWidget(self.N_G_Done)
-
-    def algSelect(self):
-        print("Algorithm select")
-        self.sel_alg = AlgSelect(self.SetAlgorithmButton)
+        layout.addWidget(self.doneButton)
 
     # Check if all fields have been specified
-    def n_g_done(self):
+    def new_game_done(self):
         if self.s_map is None:
             print("No map selected!")
         if self.agent_list is {'hunter':0, 'runner':0}:
@@ -197,6 +193,8 @@ class NewGameSettings(QMainWindow):
         for f in mapFiles:
             self.mapDropDownMenu.addItem(f)
 
+        # Set map to first item in list until user changes it
+        self.s_map = path.dirname(path.realpath(__file__)) + "/maps/" + str(self.mapDropDownMenu.currentText())
         self.mapDropDownMenu.currentIndexChanged.connect(self.updateMap)
         self.mapDropDownMenu.resize(150, 50)
         self.mapDropDownMenu.move(250, 110)
@@ -212,6 +210,9 @@ class NewGameSettings(QMainWindow):
         self.algorithmDropDownMenu.addItem("A*")
         self.algorithmDropDownMenu.addItem("MinMax")
         self.algorithmDropDownMenu.addItem("ExpectiMax")
+
+        # Set algorithm to first item in the list until user changes it
+        self.s_alg = str(self.algorithmDropDownMenu.currentText())
         self.algorithmDropDownMenu.currentIndexChanged.connect(self.updateAlgorithm)
         self.algorithmDropDownMenu.move(250, 310)
 
