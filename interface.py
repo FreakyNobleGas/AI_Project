@@ -112,29 +112,44 @@ class mainWindow(QMainWindow):
 
 class NewGameSettings(QMainWindow):
     def __init__(self, parent=None):
-        #super(NewGameSettings, self).__init__(parent)
+        # Basic Window Settings
         self.left = 100
         self.right = 100
         self.width = 800
         self.height = 600
         self.title = 'New Game'
+
+        # Holds all game information to be passed to game engine
         self.s_map = None
-        self.agent_list = {}
+        self.agent_list = {'hunter':0, 'runner':0}
         self.s_alg = None
         self.alg_text = ''
         self.sel_agents = AgentSelect()
-        #self.initUi()
 
     def initUi(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.right, self.width, self.height)
         self.menu = QVBoxLayout()
         self.menu = self.newGameButtons(self.menu)
+        self.agentButtons = self.AgentButtons(QVBoxLayout())
         self.show()
 
     def newGameButtons(self, layout):
         buffer_len = 100
 
+        self.MapTitle = QLabel(self)
+        self.MapTitle.setFrameStyle(QFrame.Panel | QFrame.Sunken)
+        self.MapTitle.move(100, 100)
+
+        self.AgentTitle = QLabel(self)
+        self.AgentTitle.setText("Select Agents")
+        self.AgentTitle.move(100, 200)
+
+        self.AlgorithmTitle = QLabel(self)
+        self.AlgorithmTitle.setText("Select Algorithm")
+        self.AlgorithmTitle.move(100, 300)
+
+        '''
         self.SetMapButton = QPushButton("Choose Map", self)
         self.SetMapButton.clicked.connect(self.mapSelect)
         self.SetMapButton.resize((len("Choose Map") * 10), 100)
@@ -151,15 +166,17 @@ class NewGameSettings(QMainWindow):
         self.SetAlgorithmButton.clicked.connect(self.algSelect)
         self.SetAlgorithmButton.resize((len("Set Agent Settings") * 10), 100)
         self.SetAlgorithmButton.move(buffer_len, 100)
+        '''
 
         self.N_G_Done = QPushButton("Done", self)
         self.N_G_Done.clicked.connect(self.n_g_done)
-        self.N_G_Done.resize(400, 100)
-        self.N_G_Done.move(100, 400)
-
+        self.N_G_Done.resize(100, 100)
+        self.N_G_Done.move(400, 400)
+        '''
         layout.addWidget(self.SetMapButton)
         layout.addWidget(self.SetAgentsButton)
         layout.addWidget(self.SetAlgorithmButton)
+        '''
         layout.addWidget(self.N_G_Done)
 
     def mapSelect(self):
@@ -190,6 +207,64 @@ class NewGameSettings(QMainWindow):
             self.s_alg = self.sel_alg.getAlg()
             self.agent_list = self.sel_agents.getAgents()
             self.close()
+
+    def AgentButtons(self, layout):
+        self.AddHunter = QPushButton("Add Hunter", self)
+        self.AddHunter.clicked.connect(lambda: self.addAgent("hunter"))
+        self.AddHunter.resize(len("Add Hunter") * 10, 50)
+        self.AddHunter.move(250, 175)
+
+        self.AddRunner = QPushButton("Add Runner", self)
+        self.AddRunner.clicked.connect(lambda: self.addAgent("runner"))
+        self.AddRunner.resize(len("Add Runner") * 10, 50)
+        self.AddRunner.move(250, 225)
+
+        self.DeleteHunter = QPushButton("Delete Hunter", self)
+        self.DeleteHunter.clicked.connect(lambda: self.delAgent("hunter"))
+        self.DeleteHunter.resize(len("Delete Hunter") * 10, 50)
+        self.DeleteHunter.move(350, 175)
+
+        self.DeleteRunner = QPushButton("Delete Runner", self)
+        self.DeleteRunner.clicked.connect(lambda: self.delAgent("runner"))
+        self.DeleteRunner.resize(len("Delete Runner") * 10, 50)
+        self.DeleteRunner.move(350, 225)
+        '''
+        self.A_B_Done = QPushButton("Done", self)
+        self.A_B_Done.clicked.connect(self.close)
+        self.A_B_Done.resize(600, 100)
+        self.A_B_Done.move(100, 400)
+        '''
+        self.HunterLabel = QLabel(self)
+        self.HunterLabel.setAlignment(Qt.AlignCenter)
+        self.HunterLabel.setText("Hunters: " + str(self.agent_list["hunter"]))
+        self.HunterLabel.move(500, 185)
+
+        self.RunnerLabel = QLabel(self)
+        self.RunnerLabel.setAlignment(Qt.AlignCenter)
+        self.RunnerLabel.setText("Runners: " + str(self.agent_list["runner"]))
+        self.RunnerLabel.move(500, 230)
+
+        layout.addWidget(self.AddHunter)
+        layout.addWidget(self.AddRunner)
+        layout.addWidget(self.DeleteHunter)
+        layout.addWidget(self.DeleteRunner)
+        #layout.addWidget(self.A_B_Done)
+        layout.addWidget(self.HunterLabel)
+        layout.addWidget(self.RunnerLabel)
+
+    def addAgent(self, agent):
+        self.agent_list[agent] += 1
+        self.HunterLabel.setText("Hunters: " + str(self.agent_list['hunter']))
+        self.RunnerLabel.setText("Runners: " + str(self.agent_list['runner']))
+
+    def delAgent(self, agent):
+        if self.agent_list[agent] is not 0:
+            self.agent_list[agent] -= 1
+            self.HunterLabel.setText("Hunters: " + str(self.agent_list['hunter']))
+            self.RunnerLabel.setText("Runners: " + str(self.agent_list['runner']))
+
+    def getAgents(self):
+        return self.agent_list
 
 class AgentSelect(QMainWindow):
     def __init__(self, parent=None):
