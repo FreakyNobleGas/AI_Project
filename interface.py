@@ -163,7 +163,7 @@ class NewGameSettings(QMainWindow):
 
         self.N_G_Done = QPushButton("Done", self)
         self.N_G_Done.clicked.connect(self.n_g_done)
-        self.N_G_Done.resize(100, 100)
+        self.N_G_Done.resize(300, 100)
         self.N_G_Done.move(400, 400)
 
         layout.addWidget(self.N_G_Done)
@@ -189,6 +189,8 @@ class NewGameSettings(QMainWindow):
 
     def mapMenu(self, layout):
         self.mapDropDownMenu = QComboBox(self)
+
+        # Go into the maps directory and insert every map file name into a list for the user to select
         mapDir = path.dirname(path.realpath(__file__)) + "/maps/"
         mapFiles = [f for f in listdir(mapDir) if isfile(join(mapDir, f))]
 
@@ -199,9 +201,9 @@ class NewGameSettings(QMainWindow):
         self.mapDropDownMenu.resize(150, 50)
         self.mapDropDownMenu.move(250, 110)
 
+    # Update algorithm selection after the user selects a new algorithm in the drop down menu
     def updateAlgorithm(self):
         self.s_alg = str(self.algorithmDropDownMenu.currentText())
-        print("Alg = ", self.s_alg)
 
     def algorithMenu(self, layout):
         self.algorithmDropDownMenu = QComboBox(self)

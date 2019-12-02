@@ -151,6 +151,7 @@ class agent(pygame.sprite.Sprite):
 			hunters = [agent for agent in self.agents if agent.role is 'hunter']
 
 		runners = [agent for agent in self.c_agent_list if agent.role is 'runner']
+		
 		# Check for role of agent then return true based on criteria
 		if self.role is 'hunter':
 			# Hunter criteria
