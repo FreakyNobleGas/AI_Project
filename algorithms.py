@@ -70,19 +70,26 @@ class worldState:
 		return self.agentPositions[agent]
 
 class baseAlgorithm:
-	def __init__(self, agent_pos, c_map, agent_list = None, listIndex = None):
+	def __init__(self, agent_pos, c_map, c_agent_list = None, listIndex = None):
 		self.agent_pos = (agent_pos[0],agent_pos[1])
 		self.c_map = c_map
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
 		self.facing = 0
-		self.agent_list = agent_list
+		self.agent_list = c_agent_list
+		self.index = listIndex
+		#print("LI--",listIndex)
+		
 
 	def isValidMove(self,plannedPosition):
 		# takes a position, and returns if the move would collide with
 		# a world object.  Needed for the algorithms
+		self.agent = self.agent_list[self.index]
 		if plannedPosition in self.wallList:
 			#print("isValidMove wall collision")
 			return False
+		for a in self.agent_list:
+			if (plannedPosition == a.getPos()) and (a.getType() == self.getType()):#"hunter"):
+				return False
 		return True
 
 	def manhattanDistance(self,pos1,pos2):
@@ -100,19 +107,22 @@ class baseAlgorithm:
 		# this could be expanded to use diagonals, but may overly
 		#expand the scope of the project
 		None
+	
+	def getType(self):
+		return self.agent.getType()
 
 
 class genericAlgorithms(baseAlgorithm):
 	# This generic algorithm is a basic structure to show how to
 	# interface between the agent and algorithm in a way that the game
 	# engine can use the data
-	def __init__(self, agent_pos, c_map):
+	'''def __init__(self, agent_pos, c_map): # use base init
 		# Create Algorithm
 		self.agent_pos = (agent_pos[0],agent_pos[1])
 		self.c_map = c_map
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
 		#self.wallList.expand(c_map.get_walls())
-		self.facing = 0
+		self.facing = 0'''
 
 	def move(self,unusedPos = None):
 		d = (random.randrange(0,3,1))
@@ -197,6 +207,8 @@ class testAlgorithm(baseAlgorithm):
 		# rt: +1 0
 		# this set initializes the NSEW squares in a list, if valid
 		# There is probably a better way to do this
+		if self.isValidMove(((pPos[0]),(pPos[1]))): # don't move if current position is ideal
+			pList.append((((pPos[0]),(pPos[1])),999999999))
 		if self.isValidMove(((pPos[0]),(pPos[1]-1))):
 			pList.append((((pPos[0]),(pPos[1]-1)),999999999))
 		if self.isValidMove(((pPos[0]),(pPos[1]+1))):
@@ -242,7 +254,7 @@ class Reflex(baseAlgorithm):
 		self.facing = 0
 		self.agent_list = c_agent_list
 		self.rand = randomness
-		self.lIndex = listIndex
+		self.index = listIndex
 		#randomness is the chance to go in a random direction
 
 
@@ -263,6 +275,8 @@ class Reflex(baseAlgorithm):
 		# rt: +1 0
 		# this set initializes the NSEW squares in a list, if valid
 		# There is probably a better way to do this
+		if self.isValidMove(((pPos[0]),(pPos[1]))): # don't move if current position is ideal
+			pList.append((((pPos[0]),(pPos[1])),999999999))
 		if self.isValidMove(((pPos[0]),(pPos[1]-1))):
 			pList.append((((pPos[0]),(pPos[1]-1)),999999999))
 		if self.isValidMove(((pPos[0]),(pPos[1]+1))):
@@ -271,6 +285,9 @@ class Reflex(baseAlgorithm):
 			pList.append((((pPos[0]-1),(pPos[1])),999999999))
 		if self.isValidMove(((pPos[0]+1),(pPos[1]))):
 			pList.append((((pPos[0]+1),(pPos[1])),999999999))
+		
+		if len(pList) == 0: # if no valid moves currently, don't bother checking
+			return (pPos[0]),(pPos[1])
 		# all valid positions now in a list
 		# pList is [((x,y),manhattanDist),...]
 		# manhattanDist val is init as a very large value, vastly larger
@@ -396,6 +413,8 @@ class BFS(baseAlgorithm):
 
 	def move(self, cur_pos):
 		# Caller function for bfs
+		if self.agents[self.lIndex].getType() == "hunter":
+			return self.bfs(cur_pos, self.c_map, self.agents)
 		return self.bfs(cur_pos, self.c_map, self.agents)
 
 	def bfs(self, agent_pos, c_map, c_agent_list):

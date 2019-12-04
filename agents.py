@@ -72,7 +72,7 @@ class agent(pygame.sprite.Sprite):
 
 		else:
 			print("Using generic algorithms.")
-			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map)
+			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 
 		# Assign Image
 		print("Role: ", self.role)

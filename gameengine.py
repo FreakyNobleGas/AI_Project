@@ -39,7 +39,7 @@ gameWindow = (100,100)
 
 class gameEngine():
 
-	def __init__(self, agentsList, wallList, newMap, safeList = None, c_agent=None, c_alg=None):
+	def __init__(self, agentsList, wallList, newMap, safeList = [], c_agent=None, c_alg=None):
 		self.wallList = wallList
 		wallGroup = pygame.sprite.Group()
 		safeGroup = pygame.sprite.Group()
@@ -69,8 +69,11 @@ class gameEngine():
 
 		agentGroup = pygame.sprite.Group()
 		# agentsList is a list of agents, passed into agentGroup
+		totalRunners = 0
 		for i in agentsList:
 			agentGroup.add(i)
+			if i.getType() == "runner":
+				totalRunners +=1
 
 		gameOver = 0
 		updateGame = 1
@@ -108,10 +111,10 @@ class gameEngine():
 							a.markForDeath()
 							a.kill()
 				if (runnerSafe > 0) and (stillRunning == 0):
-					print("Runners won!  ",runnerSafe, " runners made it to Goal")
+					print("Runners won!  ",runnerSafe, " runners made it to Goal ", totalRunners-runnerSafe, " were caught")
 					gameOver = 1
 				elif (runnerCount == 0) and (runnerSafe == 0):
-					print("Hunters won!  No remaining Runners")
+					print("Hunters won!  No remaining Runners, ",totalRunners-runnerSafe, " runners were caught")
 					gameOver = 1
 			
 
