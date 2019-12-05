@@ -296,6 +296,50 @@ class Reflex(baseAlgorithm):
 			# random move with self.rand as the threshold
 			return pList[random.randrange(0,len(pList),1)][0]
 
+
+		# get nearest opposing agent:
+		nearest = 9999999
+		for agent in self.agent_list:
+			# find closest agent's distance
+			agentVal = self.linDist(self.agent_pos, agent.getPos())
+			if (agentVal < nearest) and not(agent.getType() == self.agent.getType()):
+				nearest = agentVal
+				nearestAgent = agent
+	
+		# if hunter: move toward nearest runner, found above
+		# if runner, move toward exit unless hunter is too close
+		if self.getType() == "runner":
+			agentDist = 0
+			moveIndex = 0
+			if nearest < 5: # if too close run
+				for i in range(0,len(pList)):
+					tempDist = self.linDist(pList[i][0], nearestAgent.getPos())
+					pList[i] = ((pList[i][0]), tempDist)
+					if tempDist > agentDist:
+						agentDist = tempDist
+						moveIndex = i
+				print("Running", pList)
+				return pList[moveIndex][0] # return the move most opposite of the hunter
+				
+			else: # head toward exit
+				currentBest = 999999999
+				currentIndex =  None
+				for i in range(0,len(pList)):
+					# for each square, go through list of agents, finding 
+					# the closest step to the closest exit
+					bestVal = 99999999
+					for safe in self.c_map.get_safezone():
+						tempVal = self.linDist(pList[i][0],safe)
+						#print("safe: ",safe," temp ",tempVal)
+						if  tempVal < bestVal:
+							bestVal = tempVal
+					if bestVal < currentBest:
+						currentBest = bestVal
+						currentIndex = i
+					pList[i] = ((pList[i][0]),bestVal)
+				return pList[currentIndex][0]
+			
+			
 		# else keep going
 		for i in range(0,len(pList)):
 			# for each square, go through list of agents, finding the closest
@@ -304,13 +348,7 @@ class Reflex(baseAlgorithm):
 				# find closest agent's distance
 				agentVal = self.linDist(pList[i][0], agent.getPos())
 
-				''' old code, moved to agent.update() to make it universal
-				if (agentVal <=1)and not(agent.getType() == self.agent_list[self.lIndex].getType()):
-					agent.kill()
-					# this kills off a tagged runner
-					# can also add a gameType conditional, to change them to hunters
-				'''
-				if (agentVal < bestVal) and not(agent.getType() == "hunter"):#self.agent_list[self.lIndex].getType()):
+				if (agentVal < bestVal) and not(agent.getType() == self.agent.getType()):
 					# NOTE: this is currently set as a dedicated hunter-only
 					# algorithm.  only works for hunters chasing runners
 					# (to avoid chasing itself and not moving)
@@ -319,9 +357,9 @@ class Reflex(baseAlgorithm):
 					# isn't working properly with two hunters.
 					bestVal = agentVal
 			pList[i] = ((pList[i][0]),bestVal)
-			# the above loop should find the closest agent to that position,
-			# and sets the value for the position being checked to that
-			# value
+			# the above loop should find the closest opposing agent to that 
+			# position, and sets the value for the position being checked 
+			# to that value
 		bestIndex = None
 		bestVal = 999999999
 		for i in range(0,len(pList)):
@@ -329,6 +367,22 @@ class Reflex(baseAlgorithm):
 				bestVal = pList[i][1]
 				bestIndex = i
 		#print("PL ", pList, " BI ", pList[bestIndex])
+		
+		'''
+		if self.agent.getType() == "runner":
+			# then we want to go toward exit, but away from hunters
+			#find nearest safezone
+			safe = self.c_map.get_safezone()
+			nearestSafe = safe[0]
+			nearestDist = self.manhattanDistance(self.agent_pos, nearestSafe) 
+			for i in safe:
+				tempDist = self.manhattanDistance(self.agent_pos, i)
+				if  tempDist<nearestDist:
+					nearestSafe = i
+					nearestDist = tempDist'''
+			
+			
+			
 		return pList[bestIndex][0]
 
 
@@ -478,7 +532,7 @@ class MinMax(baseAlgorithm):
 		self.c_map = c_map
 		self.agents = c_agent_list
 		self.lIndex = listIndex
-		self.depth = 3
+		self.depth = 2
 		#self.runner_list = [agent for agent in self.c_agentList if agent.getType() is 'runner']
 		#self.hunter_list = [agent for agent in self.c_agentList if agent.getType() is 'hunter']
 

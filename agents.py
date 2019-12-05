@@ -104,10 +104,11 @@ class agent(pygame.sprite.Sprite):
 			# kill or convert.  for now, kills on hunter tagging a runner
 			if self.getType() == "hunter":
 				for a in self.c_agent_list:
-					if (a.getType() is not "hunter") and (1>= self.algorithm.manhattanDistance(self.getPos(),a.getPos())):
+					if (a.getType() is not "hunter") and (1.5>= self.algorithm.linDist(self.getPos(),a.getPos())):
 						#self.c_agent_list.remove(a)
-						a.markForDeath()
-						a.kill()
+						#a.markForDeath()
+						#a.kill()
+						a.changeTeam()
 
 		# If move_result is a list of tupples set self.com_mag
 			if isinstance(move_result, list):
@@ -174,3 +175,11 @@ class agent(pygame.sprite.Sprite):
 
 	def shouldDie(self):
 		return self.die
+		
+	def changeTeam(self):
+		if self.role == "runner":
+			self.role = "hunter"
+			self.image = pygame.image.load('./images/r-arrow-small.png')
+		else:
+			self.role = "runner"
+			self.image = pygame.image.load('./images/b-arrow-small.png')
