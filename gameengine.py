@@ -76,9 +76,11 @@ class gameEngine():
 				totalRunners +=1
 
 		gameOver = 0
+		cycleLimit = 1000000
 		updateGame = 1
 		runnerSafe = 0
-		while not gameOver:
+		while cycleLimit and not gameOver:
+			cycleLimit -=1
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					gameOver = 1
@@ -175,20 +177,20 @@ if __name__ == "__main__":
 		r = random.randrange(0,10,1)
 		if r == 0:
 			_role = "hunter"
-			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role,  _index = (len(agentList)), _rand = 20))
+			#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role,  _index = (len(agentList)), _rand = 20))
 		elif r >=1 and r<=3:
 			_role = "runner"
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role = _role, _index = (len(agentList))))
 		elif r > 3 and r <6:
 			_role = "runner"
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "DFS", _role = _role, _index = (len(agentList))))
-		#elif r >=6 and r <9:
-			#_role = "runner"
-			#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role, _index = (len(agentList))))
+		elif r >=6 and r <9:
+			_role = "runner"
+			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role, _index = (len(agentList))))
 		else:
 			_role = "runner"
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role = _role,  _index = (len(agentList))))
-	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter", _index = (len(agentList))))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter", _index = (len(agentList))))
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="runner", _index = (len(agentList))))
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="runner", _index = (len(agentList))))
 	
