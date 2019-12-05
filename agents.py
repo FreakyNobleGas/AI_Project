@@ -38,6 +38,7 @@ class agent(pygame.sprite.Sprite):
 		self.totalEvalScore = 0.0
 		print("lInd- ",_index)
 		self.die = 0
+		self.teamChanged = 0
 
 		# TODO: Add vield of vision / direction facing variables
 
@@ -96,6 +97,12 @@ class agent(pygame.sprite.Sprite):
 		'''
 		#self.agent_pos = self.algorithm.move()
 		# Possible way of doing persistant commands by checking for existing commands in the object.
+		if self.teamChanged:
+			# if team has changed (runner converted to hunter) clear 
+			#the move list and reset teamChanged in case it changes back
+			self.com_mag = None
+			self.teamChanged = 0
+			
 		if not self.com_mag:
 			#print("self.agentpos",self.agent_pos)
 			move_result = self.algorithm.move(self.agent_pos)
@@ -105,7 +112,8 @@ class agent(pygame.sprite.Sprite):
 			if self.getType() == "hunter":
 				for a in self.c_agent_list:
 					if (a.getType() is not "hunter") and (1.5>= self.algorithm.linDist(self.getPos(),a.getPos())):
-						#self.c_agent_list.remove(a)
+						# a.markForDeath, a.kill() used to kill runners
+						# a.changeTeam() converts them into Reflex hunters
 						#a.markForDeath()
 						#a.kill()
 						a.changeTeam()
@@ -177,9 +185,12 @@ class agent(pygame.sprite.Sprite):
 		return self.die
 		
 	def changeTeam(self):
+		self.teamChanged = 1
 		if self.role == "runner":
 			self.role = "hunter"
 			self.image = pygame.image.load('./images/r-arrow-small.png')
+			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
+			
 		else:
 			self.role = "runner"
 			self.image = pygame.image.load('./images/b-arrow-small.png')

@@ -76,7 +76,9 @@ class baseAlgorithm:
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
 		self.facing = 0
 		self.agent_list = c_agent_list
+		self.agents = c_agent_list
 		self.index = listIndex
+		self.lIndex = listIndex
 		#print("LI--",listIndex)
 		
 
@@ -389,11 +391,11 @@ class Reflex(baseAlgorithm):
 class DFS(baseAlgorithm):
 	# NOTE: DFS may not work well in this setup- need a map with paths
 	# to be able to limit depth paths (and avoid looping)
-	def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
+	'''def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list
-		self.lIndex = listIndex
+		self.lIndex = listIndex'''
 
 	def move(self, cur_pos):
 		# Caller function for dfs
@@ -459,11 +461,11 @@ class DFS(baseAlgorithm):
 
 
 class BFS(baseAlgorithm):
-	def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
+	'''def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list
-		self.lIndex = listIndex
+		self.lIndex = listIndex'''
 
 	def move(self, cur_pos):
 		# Caller function for bfs
