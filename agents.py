@@ -28,7 +28,7 @@ class agent(pygame.sprite.Sprite):
 		self.role = _role
 		self.image = _image
 		self.image2 = _image2
-		self.sScale = 1
+		self.sScale = .5
 		self.spriteR = 20 * self.sScale
 		self.com_mag = None
 		_algorithm = c_alg
@@ -106,17 +106,21 @@ class agent(pygame.sprite.Sprite):
 		if not self.com_mag:
 			#print("self.agentpos",self.agent_pos)
 			move_result = self.algorithm.move(self.agent_pos)
-			print("Move result: ", move_result)
+			#print("Move result: ", move_result)
 
 			# kill or convert.  for now, kills on hunter tagging a runner
 			if self.getType() == "hunter":
 				for a in self.c_agent_list:
 					if (a.getType() is not "hunter") and (1.5>= self.algorithm.linDist(self.getPos(),a.getPos())):
 						# a.markForDeath, a.kill() used to kill runners
+						if self.c_map.getGameType() == 0: # kill runners, default
+							a.markForDeath()
+							a.kill()
 						# a.changeTeam() converts them into Reflex hunters
-						#a.markForDeath()
-						#a.kill()
-						a.changeTeam()
+						elif self.c_map.getGameType() == 1: # convert runners
+							a.changeTeam()
+						else:
+							print("no gameType ",self.c_map.getGameType(),"! ")
 
 		# If move_result is a list of tupples set self.com_mag
 			if isinstance(move_result, list):
@@ -189,6 +193,9 @@ class agent(pygame.sprite.Sprite):
 		if self.role == "runner":
 			self.role = "hunter"
 			self.image = pygame.image.load('./images/r-arrow-small.png')
+			self.sScale = .5
+			self.spriteR = 20 * self.sScale
+			self.image = pygame.transform.scale(self.image, (int(self.spriteR * 2), int(self.spriteR * 2)))
 			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
 			
 		else:

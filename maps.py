@@ -16,7 +16,7 @@ class Map():
 	"
 	"Input: String that is the name of map file.
 	"""
-	def __init__(self, map_name=None):
+	def __init__(self, map_name=None, c_gameType = 0):
 		self.safe_zone = []
 		self.walls = []
 		self.map_bounds = []
@@ -26,6 +26,7 @@ class Map():
 		self.y_bound = None
 		self.map_name = map_name
 		self.get_map_assets(map_name)
+		self.gameType = c_gameType
 
 	def map_foo(self):
 		print("In Map Foo")
@@ -123,3 +124,10 @@ class Map():
 		#print("Valid Moves: ", valid_moves)
 
 		return valid_moves
+		
+	def getGameType(self):
+		return self.gameType
+	
+	def getName(self):
+		return self.map_name
+		

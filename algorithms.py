@@ -506,7 +506,7 @@ class BFS(baseAlgorithm):
 				# Check if move is a goal state and if it is, then return list of
 				# instructions
 				if current_agent.isGoal(move):
-					print('GOAL')
+					#print('GOAL')
 					# Go through path map and create a list of instructions
 					path_map[(move, direction)] = (current_pos)
 					com = path_map[current_pos]

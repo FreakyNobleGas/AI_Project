@@ -23,7 +23,7 @@ import agents
 import maps
 
 
-sScale =1
+sScale =.5
 spriteR = 20 * sScale
 #sprite radius.  should be directly related to sprite/grid size
 #currently, all sprites are 40x40, so sR=20
@@ -65,7 +65,11 @@ class gameEngine():
 		winsize[1] = int(gameWindow[1]*2*spriteR)
 		screen = pygame.display.set_mode(winsize)
 		pygame.display.flip()
-		pygame.display.set_caption('Freeze Tag')
+		if newMap.getGameType() == 0:
+			typeString = "Tag Out"
+		else:
+			typeString = "Zombies"
+		pygame.display.set_caption(newMap.getName()+" "+typeString)
 
 		agentGroup = pygame.sprite.Group()
 		# agentsList is a list of agents, passed into agentGroup
@@ -76,11 +80,10 @@ class gameEngine():
 				totalRunners +=1
 
 		gameOver = 0
-		cycleLimit = 1000000
+		cycleLimit = 10000
 		updateGame = 1
 		runnerSafe = 0
 		while cycleLimit and not gameOver:
-			cycleLimit -=1
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					gameOver = 1
@@ -92,6 +95,7 @@ class gameEngine():
 					if event.key == pygame.K_c:
 						updateGame = 1
 			if updateGame:
+				cycleLimit -=1 # only count while updating or pause breaks
 				screen.fill((0,0,0)) #this clears the screen.
 				agentGroup.update(screen) #runs agent.update() on each agent in group
 
@@ -171,10 +175,13 @@ class safeTile(wallTile):
 if __name__ == "__main__":
 	agentList = []
 	wallList = []
-	c_map = maps.Map("maps/complex2.txt")
+	maplist = "huge.txt","complex2.txt","complex.txt",  "default.txt",  "empty-large.txt",  "pacman.txt",  "test.txt"
+	i = random.randint(0,6)
+	chosenMap = "maps/"+maplist[i]
+	c_map = maps.Map(chosenMap, c_gameType = random.randint(0,1))#"maps/complex2.txt")
 	
 	for i in range(0,20):
-		r = random.randrange(0,10,1)
+		r = random.randint(0,10)
 		if r == 0:
 			_role = "hunter"
 			#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role,  _index = (len(agentList)), _rand = 20))
@@ -186,11 +193,11 @@ if __name__ == "__main__":
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "DFS", _role = _role, _index = (len(agentList))))
 		elif r >=6 and r <9:
 			_role = "runner"
-			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role, _index = (len(agentList))))
+			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role, _index = (len(agentList)), _rand=20))
 		else:
 			_role = "runner"
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role = _role,  _index = (len(agentList))))
-	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter", _index = (len(agentList))))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter", _index = (len(agentList)), _rand=20))
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="runner", _index = (len(agentList))))
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="runner", _index = (len(agentList))))
 	
