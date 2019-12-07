@@ -1,0 +1,54 @@
+AI Project code documentation
+
+Authors: Adrien, Karl, and Nick
+
+
+maps.py:
+--------
+Generates a game map from a file.  Called with:
+c_map = maps.Map("someMap.txt", c_gameType = 0)
+
+map name is relatice to current path, so if the map is in the maps directory, it would be called "maps/someMap.txt"
+
+Game Type is 0 for standart tag-out, 1 for zombie-style tag to convert.
+
+
+
+agents.py:
+----------
+Contains the agent code, including the tagging system, movement system and the drawable part of the agents. Agents are spawned into a list using:
+
+agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = "hunter", _index = (len(agentList)), _rand=20))
+
+This adds a Hunter agent to the list, using the Reflex algorithm, with a 20% chance that instead of heading toward the nearest runner it takes a random move.
+Note that _index is the agent's index in the list, needed for self referencing in most agents.  
+
+
+
+algorithms.py:
+--------------
+This contains the implementations for every search algorithm used.  Most use an init call of: 
+algorithm(position, map, agentList, selfIndex)
+
+Some, like the Reflex agent, take additional arguments.  All inherit from the baseAlgorithm class, which contains several of the useful functions for the agents:
+isValidMove(), manhattanDistance() and linDist() for instance.  Algorithms return either a single step move, or a list of moves to be progressively followed.
+
+
+
+gameengine.py:
+--------------
+The core game engine.  Calls the other core function features to run the game.  When using the game engine, it is initialized using the call:
+
+gameEngine(agentList,wallList, c_map, safeList)
+
+wallList, safeList are done by retrieving the lists from the created map:
+
+wallList = [wallTile(i) for i in (c_map.get_walls()+c_map.get_map_bounds())]
+safeList = [safeTile(i) for i in (c_map.get_safezone())] 
+
+The game engine supports the following keys during run:
+Esc: quit game
+P: Pause game
+c: Continue game
+
+
