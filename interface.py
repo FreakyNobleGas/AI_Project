@@ -137,7 +137,7 @@ class NewGameSettings(QMainWindow):
 
         # Create layouts for each setting: Map, Agents, and Algorithm
         self.menu = self.newGameButtons(QVBoxLayout())
-        self.mapMenu = self.mapMenu(QVBoxLayout())
+        self.mapMenuLayout = self.mapMenu(QVBoxLayout())
         self.agentButtons = self.AgentButtons(QVBoxLayout())
         self.algorithmMenu = self.algorithMenu(QVBoxLayout())
 
