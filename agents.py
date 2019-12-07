@@ -70,6 +70,8 @@ class agent(pygame.sprite.Sprite):
 			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
 		elif _algorithm.lower() == "test":
 			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
+		elif _algorithm.lower() == "testmm":
+			self.algorithm = testMM(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
 
 		else:
 			print("Using generic algorithms.")
@@ -201,3 +203,6 @@ class agent(pygame.sprite.Sprite):
 		else:
 			self.role = "runner"
 			self.image = pygame.image.load('./images/b-arrow-small.png')
+	
+	def getAlg(self):
+		return self.algorithm
