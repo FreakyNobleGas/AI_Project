@@ -123,6 +123,7 @@ class agent(pygame.sprite.Sprite):
 							a.changeTeam()
 						else:
 							print("no gameType ",self.c_map.getGameType(),"! ")
+			self.facing = self.algorithm.facing
 
 		# If move_result is a list of tupples set self.com_mag
 			if isinstance(move_result, list):
@@ -137,12 +138,13 @@ class agent(pygame.sprite.Sprite):
 			else:
 				#print("MR: ",move_result)
 				self.agent_pos = move_result[0]
-				self.facing = move_result[1]
+				#self.facing = move_result[1]
 		else:
 			first_result = self.com_mag[0]
 			self.agent_pos = first_result[0]
 			self.facing = first_result[1]
 			self.com_mag.pop(0)
+		#self.facing = self.algorithm.facing
 		rotated_image = pygame.transform.rotate(self.image, 90*(self.facing))
 		#self.image = rotated_image
 		self.rect = pygame.Rect(self.agent_pos[0] * 2 * self.spriteR,

@@ -193,13 +193,13 @@ if __name__ == "__main__":
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "DFS", _role = _role, _index = (len(agentList))))
 		elif r >=6 and r <8:
 			_role = "runner"
-			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role, _index = (len(agentList)), _rand=20))
+			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role, _index = (len(agentList)), _rand=10))
 		else:
 			_role = "runner"
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role = _role,  _index = (len(agentList))))
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "reflex", _role ="runner", _index = (len(agentList)), _rand=0))
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="runner", _index = (len(agentList))))
-	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "reflex", _role ="hunter", _index = (len(agentList))))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "reflex", _role ="hunter", _index = (len(agentList)), _rand = 10))
 	
 	wallList = [wallTile(i) for i in (c_map.get_walls()+c_map.get_map_bounds())] # Black Magic
 	safeList = [safeTile(i) for i in (c_map.get_safezone())] 

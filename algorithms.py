@@ -10,7 +10,7 @@
 ###########################################################################
 import random
 import math
-import copy
+
 
 # TODO: Create manhattan distance algorithm that accounts for walls
 class hunterEvalFunction:
@@ -135,16 +135,16 @@ class baseAlgorithm:
 			
 	def BFSDist(self, pPos, pos2):
 		# need to start a queue, and a Visited list
-		if self.linDist(pPos,pos2)>20:
+		if self.manhattanDistance(pPos,pos2)>15:
 			#print("Foo")
-			return self.linDist(pPos,pos2)
+			return self.manhattanDistance(pPos,pos2)
 		#print("No Foo")
 		visited = []
 		# find & return distance to target (depth
 		distance = 0
 		tempList = self.generateMoves(pPos) #generate first set of positions
 		#print(tempList)
-		while not (pos2 in tempList) and (distance < 100) :#and not (len(tempList)==0):#not len([item for item in tempList if item==pos2])==0:
+		while not (pos2 in tempList) and (distance < 30) :#and not (len(tempList)==0):#not len([item for item in tempList if item==pos2])==0:
 			#print("P2: ",pos2," TL: ",tempList)
 			distance +=1
 			#use current list to generate a new one
@@ -157,8 +157,8 @@ class baseAlgorithm:
 					tempList+=self.generateMoves(aPos)
 					visited.append(aPos)
 			if len(tempList)==0:
-				print("Empty List!")
-				return 1000#if list is empty, pathing broke?  or found target?
+				#print("Empty List!")
+				return distance#1000#if list is empty, exhausted possible moves without finding target
 
 			#print("TL: ", tempList, " Dist ", distance)
 		return distance
@@ -172,15 +172,15 @@ class baseAlgorithm:
 		#same method as Reflex
 		pList = []
 		if self.isValidMove(((pPos[0]),(pPos[1]))): # don't move if current position is ideal
-			pList.append((((pPos[0]),(pPos[1])),defaultValue-1))
+			pList.append((((pPos[0]),(pPos[1])),defaultValue-1,-1))
 		if self.isValidMove(((pPos[0]),(pPos[1]-1))):
-			pList.append((((pPos[0]),(pPos[1]-1)),defaultValue))
+			pList.append((((pPos[0]),(pPos[1]-1)),defaultValue,1))
 		if self.isValidMove(((pPos[0]),(pPos[1]+1))):
-			pList.append((((pPos[0]),(pPos[1]+1)),defaultValue))
+			pList.append((((pPos[0]),(pPos[1]+1)),defaultValue,3))
 		if self.isValidMove(((pPos[0]-1),(pPos[1]))):
-			pList.append((((pPos[0]-1),(pPos[1])),defaultValue))
+			pList.append((((pPos[0]-1),(pPos[1])),defaultValue,2))
 		if self.isValidMove(((pPos[0]+1),(pPos[1]))):
-			pList.append((((pPos[0]+1),(pPos[1])),defaultValue))
+			pList.append((((pPos[0]+1),(pPos[1])),defaultValue,0))
 		if randomize:
 			random.shuffle(pList)
 		return pList
@@ -273,7 +273,7 @@ class genericAlgorithms(baseAlgorithm):
 
 
 
-class testAlgorithm(baseAlgorithm):
+class testAlgorithm(baseAlgorithm): # should remain unused.  For basic interface demonstration
 	def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
 		self.agent_pos = (agent_pos[0],agent_pos[1])
 		self.c_map = c_map
@@ -372,21 +372,8 @@ class Reflex(baseAlgorithm):
 		# dn: 0 +1
 		# lf: -1 0
 		# rt: +1 0
-		# this set initializes the NSEW squares in a list, if valid
-		# There is probably a better way to do this
 		pList = self.generateMovelist(pPos, 999999999,1)
-		'''
-		if self.isValidMove(((pPos[0]),(pPos[1]))): # don't move if current position is ideal
-			pList.append((((pPos[0]),(pPos[1])),999999999))
-		if self.isValidMove(((pPos[0]),(pPos[1]-1))):
-			pList.append((((pPos[0]),(pPos[1]-1)),999999999))
-		if self.isValidMove(((pPos[0]),(pPos[1]+1))):
-			pList.append((((pPos[0]),(pPos[1]+1)),999999999))
-		if self.isValidMove(((pPos[0]-1),(pPos[1]))):
-			pList.append((((pPos[0]-1),(pPos[1])),999999999))
-		if self.isValidMove(((pPos[0]+1),(pPos[1]))):
-			pList.append((((pPos[0]+1),(pPos[1])),999999999))'''
-		
+
 		if len(pList) == 0: # if no valid moves currently, don't bother checking
 			return (pPos[0]),(pPos[1])
 		# all valid positions now in a list
@@ -395,7 +382,9 @@ class Reflex(baseAlgorithm):
 		# than expected max paths
 		if (self.rand >= (random.randrange(0,100,1))):
 			# random move with self.rand as the threshold
-			return pList[random.randrange(0,len(pList),1)][0]
+			ranDir = random.randrange(0,len(pList),1)
+			self.facing = pList[ranDir][2]
+			return pList[ranDir][0]
 
 
 		# get nearest opposing agent:
@@ -416,11 +405,12 @@ class Reflex(baseAlgorithm):
 			if nearest < 5: # if too close run
 				for i in range(0,len(pList)):
 					tempDist = self.linDist(pList[i][0], nearestAgent.getPos())
-					pList[i] = ((pList[i][0]), tempDist)
+					pList[i] = ((pList[i][0]), tempDist,pList[i][2])
 					if tempDist > agentDist:
 						agentDist = tempDist
 						moveIndex = i
 				#print("Running", pList)
+				self.facing = pList[moveIndex][2]
 				return pList[moveIndex][0] # return the move most opposite of the hunter
 				
 			else: # head toward exit
@@ -438,7 +428,8 @@ class Reflex(baseAlgorithm):
 					if bestVal < currentBest:
 						currentBest = bestVal
 						currentIndex = i
-					pList[i] = ((pList[i][0]),bestVal)
+					pList[i] = ((pList[i][0]),bestVal,pList[i][2])
+				self.facing = pList[currentIndex][2]
 				return pList[currentIndex][0]
 			
 			
@@ -459,7 +450,7 @@ class Reflex(baseAlgorithm):
 					# SECONDARY: self.agent_list[self.lIndex].getType() 
 					# isn't working properly with two hunters.
 					bestVal = agentVal
-			pList[i] = ((pList[i][0]),bestVal)
+			pList[i] = ((pList[i][0]),bestVal,pList[i][2])
 			# the above loop should find the closest opposing agent to that 
 			# position, and sets the value for the position being checked 
 			# to that value
@@ -471,32 +462,14 @@ class Reflex(baseAlgorithm):
 				bestIndex = i
 		#print("PL ", pList, " BI ", pList[bestIndex])
 		
-		'''
-		if self.agent.getType() == "runner":
-			# then we want to go toward exit, but away from hunters
-			#find nearest safezone
-			safe = self.c_map.get_safezone()
-			nearestSafe = safe[0]
-			nearestDist = self.manhattanDistance(self.agent_pos, nearestSafe) 
-			for i in safe:
-				tempDist = self.manhattanDistance(self.agent_pos, i)
-				if  tempDist<nearestDist:
-					nearestSafe = i
-					nearestDist = tempDist'''
-			
-			
-			
+		self.facing = pList[bestIndex][2]
 		return pList[bestIndex][0]
 
 
 class DFS(baseAlgorithm):
 	# NOTE: DFS may not work well in this setup- need a map with paths
 	# to be able to limit depth paths (and avoid looping)
-	'''def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
-		self.current_pos = agent_pos
-		self.c_map = c_map
-		self.agents = c_agent_list
-		self.lIndex = listIndex'''
+	# UPDATE:  Works on all maps, visually clear it is a nonideal choice
 
 	def getAlgType(self):
 		return "DFS"
@@ -566,12 +539,8 @@ class DFS(baseAlgorithm):
 
 
 class BFS(baseAlgorithm):
-	'''def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
-		self.current_pos = agent_pos
-		self.c_map = c_map
-		self.agents = c_agent_list
-		self.lIndex = listIndex'''
-
+	# using default init from baseAlgorithm
+	
 	def getAlgType(self):
 		return "BFS"
 
