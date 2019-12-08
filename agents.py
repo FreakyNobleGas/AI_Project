@@ -56,26 +56,7 @@ class agent(pygame.sprite.Sprite):
 		self.rect = pygame.Rect(self.agent_pos[0],self.agent_pos[1], self.spriteR, self.spriteR)
 
 		# Assign Agent Algorithm
-		if _algorithm.lower() == "dfs":
-			self.algorithm = DFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "bfs":
-			self.algorithm = BFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "astar" or _algorithm.lower() == "A*":
-			self.algorithm = Astar(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "minmax":
-			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "expmax" or _algorithm.lower() == "expectimax":
-			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.lIndex)
-		elif _algorithm.lower() == "reflex":
-			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
-		elif _algorithm.lower() == "test":
-			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "testmm":
-			self.algorithm = testMM(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
-
-		else:
-			print("Using generic algorithms.")
-			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+		self.setAlg(_algorithm)
 
 		# Assign Image
 		print("Role: ", self.role)
@@ -89,6 +70,31 @@ class agent(pygame.sprite.Sprite):
 
 		# Resize image for gameWindow
 		self.image = pygame.transform.scale(self.image, (int(self.spriteR * 2), int(self.spriteR * 2)))
+
+
+	def setAlg(self,alg):
+		if alg.lower() == "dfs":
+			self.algorithm = DFS(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+		elif alg.lower() == "bfs":
+			self.algorithm = BFS(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+		elif alg.lower() == "astar" or alg.lower() == "A*":
+			self.algorithm = Astar(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+		elif alg.lower() == "minmax":
+			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+		elif alg.lower() == "expmax" or alg.lower() == "expectimax":
+			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.lIndex)
+		elif alg.lower() == "reflex":
+			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
+		elif alg.lower() == "test":
+			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
+		elif alg.lower() == "testmm":
+			self.algorithm = testMM(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
+
+		else:
+			print("Using generic algorithms.")
+			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+
+
 
 
 	def update(self, screen):
@@ -120,7 +126,7 @@ class agent(pygame.sprite.Sprite):
 							a.kill()
 						# a.changeTeam() converts them into Reflex hunters
 						elif self.c_map.getGameType() == 1: # convert runners
-							a.changeTeam()
+							a.changeTeam(self.c_alg)
 						else:
 							print("no gameType ",self.c_map.getGameType(),"! ")
 
@@ -138,10 +144,15 @@ class agent(pygame.sprite.Sprite):
 			elif move_result == None:
 				#no moves, do nothing
 				None
-			else:
+			
+			elif not isinstance(move_result[0],int):
+				#None
 				#print("MR: ",move_result)
 				self.agent_pos = move_result[0]
-				#self.facing = move_result[1]
+				self.facing = move_result[1]
+			else:# MR is a tuple
+				self.agent_pos = move_result
+
 		else:
 			first_result = self.com_mag[0]
 			self.agent_pos = first_result[0]
@@ -150,6 +161,7 @@ class agent(pygame.sprite.Sprite):
 		#self.facing = self.algorithm.facing
 		rotated_image = pygame.transform.rotate(self.image, 90*(self.facing))
 		#self.image = rotated_image
+		#print("B: ",self.agent_pos)
 		self.rect = pygame.Rect(self.agent_pos[0] * 2 * self.spriteR,
 								self.agent_pos[1] * 2 * self.spriteR,
 								self.spriteR,
@@ -203,15 +215,18 @@ class agent(pygame.sprite.Sprite):
 	def shouldDie(self):
 		return self.die
 
-	def changeTeam(self):
+	def changeTeam(self,alg):
 		self.teamChanged = 1
+		print("Alg: ",alg)
 		if self.role == "runner":
 			self.role = "hunter"
 			self.image = pygame.image.load('./images/r-arrow-small.png')
 			self.sScale = .5
 			self.spriteR = 20 * self.sScale
 			self.image = pygame.transform.scale(self.image, (int(self.spriteR * 2), int(self.spriteR * 2)))
-			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
+			#self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
+			self.c_alg = alg
+			self.setAlg(alg)
 
 		else:
 			self.role = "runner"
