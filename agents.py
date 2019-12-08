@@ -61,7 +61,7 @@ class agent(pygame.sprite.Sprite):
 		elif _algorithm.lower() == "bfs":
 			self.algorithm = BFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
 		elif _algorithm.lower() == "astar" or _algorithm.lower() == "A*":
-			self.algorithm = Astar(self.agent_pos, self.c_map, self.lIndex)
+			self.algorithm = Astar(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
 		elif _algorithm.lower() == "minmax":
 			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 		elif _algorithm.lower() == "expmax" or _algorithm.lower() == "expectimax":
