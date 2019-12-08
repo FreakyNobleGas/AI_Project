@@ -82,7 +82,7 @@ class agent(pygame.sprite.Sprite):
 		elif alg.lower() == "minmax":
 			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 		elif alg.lower() == "expmax" or alg.lower() == "expectimax":
-			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.lIndex)
+			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 		elif alg.lower() == "reflex":
 			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
 		elif alg.lower() == "test":
@@ -94,9 +94,6 @@ class agent(pygame.sprite.Sprite):
 			print("Using generic algorithms.")
 			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 
-
-
-
 	def update(self, screen):
 		'''
 		This ultimately calls the search algorithm, chooses the next step, and takes it
@@ -107,7 +104,7 @@ class agent(pygame.sprite.Sprite):
 		# Possible way of doing persistant commands by checking for existing commands in the object.
 		if self.teamChanged:
 			# if team has changed (runner converted to hunter) clear
-			#the move list and reset teamChanged in case it changes back
+			# the move list and reset teamChanged in case it changes back
 			self.com_mag = None
 			self.teamChanged = 0
 
@@ -144,7 +141,7 @@ class agent(pygame.sprite.Sprite):
 			elif move_result == None:
 				#no moves, do nothing
 				None
-			
+
 			elif not isinstance(move_result[0],int):
 				#None
 				#print("MR: ",move_result)

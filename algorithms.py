@@ -32,8 +32,8 @@ class hunterEvalFunction:
 		#print("Total list: ", total)
 		total = min(total)
 		#print("Hunter Total: ", total)
-		#return total
-		return random.randrange(0,255,1)
+		return total
+		#return random.randrange(0,255,1)
 
 class runnerEvalFunction:
 	# agentPositions holds a list of coordinates for each agent on the map
@@ -54,7 +54,7 @@ class runnerEvalFunction:
 		totalSafeZone = [self.agent.algorithm.BFSDist(self.agentPos, coordinate) for coordinate in self.safeZones]
 		self.total += (sum(totalSafeZone) * 0.5)
 
-		self.total -= 15.0
+		#self.total -= 15.0
 		#print("2 = ", self.total)
 		#print("Runner Total: ", self.total)
 		return self.total
@@ -138,7 +138,7 @@ class baseAlgorithm:
 
 	def BFSDist(self, pPos, pos2):
 		# need to start a queue, and a Visited list
-		if self.manhattanDistance(pPos,pos2)>150:
+		if self.manhattanDistance(pPos,pos2)>15:
 			#print("Foo")
 			return self.manhattanDistance(pPos,pos2)
 		#print("No Foo")
@@ -217,7 +217,7 @@ class genericAlgorithms(baseAlgorithm):
 
 	def move(self,unusedPos = None):
 		d = (random.randrange(0,3,1))
-		# Increase the max to decrease odds of turning
+		# Increase the max to decrease odds of turning(baseAlgorithm)
 		if d == 0: # turn Left
 			#print("R")
 			self.facing -=0.5
@@ -268,8 +268,6 @@ class genericAlgorithms(baseAlgorithm):
 			self.agent_pos= ((self.agent_pos[0] + x), (self.agent_pos[1] + y))
 
 		return (self.agent_pos, self.facing)
-
-
 
 class testAlgorithm(baseAlgorithm): # should remain unused.  For basic interface demonstration
 	def __init__(self, agent_pos, c_map, c_agent_list,listIndex):
@@ -832,9 +830,110 @@ class MinMax(baseAlgorithm):
 		print("best score = ", best_score[0][1])
 		return best_score[1]
 
-class ExpMax:
-	def __init__(self):
-		pass
+class ExpMax(baseAlgorithm):
+	# TODO: Ensure that game engine moves agents in the same way as minmax.
+	def __init__(self, agent_pos, c_map, c_agent_list, listIndex):
+		baseAlgorithm.__init__(self, agent_pos, c_map)
+		self.current_pos = agent_pos
+		self.c_map = c_map
+		self.agents = c_agent_list
+		# For BFSDist algorithm
+		self.agent_list = c_agent_list
+		self.index = listIndex
+		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
+
+		self.lIndex = listIndex
+		self.depth = 2
+		#self.runner_list = [agent for agent in self.c_agentList if agent.getType() is 'runner']
+		#self.hunter_list = [agent for agent in self.c_agentList if agent.getType() is 'hunter']
 
 	def getAlgType(self):
-		return "ExpMax"
+		return "MinMax"
+
+	def setup(self):
+		self.new_list = [self.agents[self.lIndex]]
+		self.indexAgentType = self.new_list[0].getType()
+		self.new_list.extend([agent for agent in self.agents if agent.getType() is self.indexAgentType and agent is not self.agents[self.lIndex]])
+		self.new_list.extend([agent for agent in self.agents if agent.getType() is not self.indexAgentType])
+
+	def move(self, agent_pos):
+		# Creates list of all agent positions for worldState
+		self.setup()
+		agent_pos_list = [agent.getPos() for agent in self.new_list]
+		#print("Agent list: ", agent_pos_list)
+		return self.minmax(worldState(agent_pos_list))
+
+	def minmax(self, worldState):
+		def get_min(worldState, current_depth, current_agent):
+			max_successors = []
+
+			#print("Current agent: ", current_agent)
+			actions = self.c_map.get_next(worldState.curPos(current_agent))
+			#print("Action List: ",actions)
+
+			for action in actions:
+				#print("action[0] = ", action[0])
+				successor = worldState.nextState(action[0], current_agent)
+				#print("successor =", successor)
+				max_successors.append((helper(successor, current_depth, current_agent + 1), action))
+
+			total = 0.0
+			for value, state in max_successors:
+				if type(value) is tuple:
+					#print("value = ", value)
+					#exit()
+					total += value[0]
+				else:
+					total += value
+
+			return total * (1.0/float(len(max_successors)))
+
+			# Might need to add code for when no actions are available
+			#print("Max Successors: ", max_successors)
+			#print("Length of Max Successors: ", len(max_successors))
+			#exit()
+			#return min(max_successors)
+
+
+		def get_max(worldState, current_depth, current_agent):
+			min_successors = []
+
+			#print("Current agent: ", current_agent)
+			actions = self.c_map.get_next(worldState.curPos(current_agent))
+
+			for action in actions:
+				successor = worldState.nextState(action[0], current_agent)
+				min_successors.append((helper(successor, current_depth, current_agent + 1), action))
+
+			# Might need to add code for when no actions are available
+			#print("Min Successors ", min_successors)
+			return max(min_successors)
+
+		def helper(worldState, current_depth, current_agent):
+			if current_agent is len(self.new_list):
+				current_depth += 1
+				current_agent = 0
+
+			if (current_depth >= self.depth):
+
+				# TODO: Add state scoring
+				if self.new_list[current_agent].getType() is "runner":
+					#self.new_list[current_agent].totalEvalScore = runnerEvalFunction(self.new_list, current_agent, self.new_list[current_agent].totalEvalScore).evaluate()
+					#return self.new_list[current_agent].totalEvalScore
+					#print("runner eval = ", runnerEvalFunction(self.new_list, current_agent).evaluate())
+					return runnerEvalFunction(self.new_list, current_agent).evaluate()
+				else:
+					#print("hunter eval = ", hunterEvalFunction(self.new_list, current_agent).evaluate())
+					return hunterEvalFunction(self.new_list, current_agent).evaluate()
+
+			if self.new_list[current_agent].getType() is self.indexAgentType:
+				return get_max(worldState, current_depth, current_agent)
+			else:
+				return get_min(worldState, current_depth, current_agent)
+
+		best_move = helper(worldState, 0, 0)
+
+		#print("---------------------")
+		#print(self.agents[self.lIndex].role ," best move = ", best_move)
+		#print("best move = ", best_move[1][0])
+		return best_move[1][0]
