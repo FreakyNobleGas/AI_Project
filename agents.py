@@ -22,7 +22,6 @@ class agent(pygame.sprite.Sprite):
 		# Create Object Variables
 		self.agent_pos = _current_pos
 		self.c_map = c_map
-		# TODO: Need to discuss agent list.
 		self.c_agent_list = c_agent_list
 		self.c_alg = c_alg
 		self.role = _role
@@ -40,9 +39,6 @@ class agent(pygame.sprite.Sprite):
 		self.die = 0
 		self.teamChanged = 0
 
-		# TODO: Add vield of vision / direction facing variables
-
-		# TODO: Add functionality for map to decide where agents start
 		if self.agent_pos == None:
 			if self.role == "runner":
 				#self.agent_pos = [1,1]#[random.randrange(5,gameWindow[0]-5,1),random.randrange(5,gameWindow[1]-5,1)]
@@ -84,7 +80,7 @@ class agent(pygame.sprite.Sprite):
 		elif alg.lower() == "expmax" or alg.lower() == "expectimax":
 			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 		elif alg.lower() == "reflex":
-			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
+			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex, self.rand)
 		elif alg.lower() == "test":
 			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
 		elif alg.lower() == "testmm":
@@ -129,9 +125,10 @@ class agent(pygame.sprite.Sprite):
 
 			# MinMax currently does not have a facing parameter
 			if type(self.algorithm) is not MinMax:
+				#print("Foo")
 				self.facing = self.algorithm.facing
 
-		# If move_result is a list of tupples set self.com_mag
+			# If move_result is a list of tupples set self.com_mag
 			if isinstance(move_result, list):
 				first_result = move_result[0]
 				self.agent_pos = first_result[0]
@@ -146,7 +143,7 @@ class agent(pygame.sprite.Sprite):
 				#None
 				#print("MR: ",move_result)
 				self.agent_pos = move_result[0]
-				self.facing = move_result[1]
+				#self.facing = move_result[1]
 			else:# MR is a tuple
 				self.agent_pos = move_result
 
@@ -158,7 +155,6 @@ class agent(pygame.sprite.Sprite):
 		#self.facing = self.algorithm.facing
 		rotated_image = pygame.transform.rotate(self.image, 90*(self.facing))
 		#self.image = rotated_image
-		#print("B: ",self.agent_pos)
 		self.rect = pygame.Rect(self.agent_pos[0] * 2 * self.spriteR,
 								self.agent_pos[1] * 2 * self.spriteR,
 								self.spriteR,
@@ -198,7 +194,6 @@ class agent(pygame.sprite.Sprite):
 
 		elif self.role is 'runner':
 			# Runner criteria
-			print("p: ",position," SafeZones: ", self.c_map.get_safezone())
 			if position in self.c_map.get_safezone():
 				return True
 

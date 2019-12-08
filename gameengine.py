@@ -83,6 +83,7 @@ class gameEngine():
 		cycleLimit = 10000
 		updateGame = 1
 		runnerSafe = 0
+		# Scoring inaccurate
 		while cycleLimit and not gameOver:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
@@ -152,7 +153,6 @@ class wallTile(pygame.sprite.Sprite):
 		screen.blit(self.image,self.rect)
 		#screen.blit() is what actually draws the image to the screen.
 		#need to update the rect. with current coordinates before drawing
-		#print("Xw: ",wallPos[0]," Yw: ", wallPos[1])
 
 	def getPos(self):
 		return self.wallPos
@@ -180,11 +180,11 @@ if __name__ == "__main__":
 	chosenMap = "maps/"+maplist[i]
 	c_map = maps.Map(chosenMap, c_gameType = random.randint(0,1))#"maps/complex2.txt")
 	
-	for i in range(0,20):
+	for i in range(0,10):
 		r = random.randint(0,10)
 		if r == 0:
 			_role = "hunter"
-			#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role,  _index = (len(agentList)), _rand = 20))
+			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role,  _index = (len(agentList)), _rand = 20))
 		elif r >=1 and r<=3:
 			_role = "runner"
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role = _role, _index = (len(agentList))))
@@ -196,8 +196,8 @@ if __name__ == "__main__":
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role, _index = (len(agentList)), _rand=10))
 		else:
 			_role = "runner"
-			#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role = _role,  _index = (len(agentList))))
-	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "reflex", _role ="runner", _index = (len(agentList)), _rand=0))
+			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role = _role,  _index = (len(agentList))))
+	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "AStar", _role ="runner", _index = (len(agentList)), _rand=0))
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="hunter", _index = (len(agentList))))
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter", _index = (len(agentList)), _rand = 10))
 	

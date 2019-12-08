@@ -73,19 +73,17 @@ class worldState:
 		return self.agentPositions[agent]
 
 class baseAlgorithm:
-	def __init__(self, agent_pos, c_map, c_agent_list = None, listIndex = None):
+	def __init__(self, agent_pos, c_map, c_agent_list = None, index = None, rand = 0):
 		self.agent_pos = (agent_pos[0],agent_pos[1])
 		self.c_map = c_map
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
 		self.facing = 0
 		self.agent_list = c_agent_list
-		self.agents = c_agent_list
-		self.index = listIndex
-		self.lIndex = listIndex
+		#self.agents = c_agent_list
+		self.index = index
+		#self.lIndex = listIndex
 		self.moveList = []
-		self.rand = 0
-		#self.agent = self.agent_list[self.index]
-		#print("LI--",listIndex)
+		self.rand = rand
 
 
 	def isValidMove(self,plannedPosition):
@@ -340,15 +338,7 @@ class testAlgorithm(baseAlgorithm): # should remain unused.  For basic interface
 
 
 class Reflex(baseAlgorithm):
-	def __init__(self, agent_pos, c_map, c_agent_list, randomness, listIndex):
-		self.agent_pos = (agent_pos[0],agent_pos[1])
-		self.c_map = c_map
-		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
-		self.facing = 0
-		self.agent_list = c_agent_list
-		self.rand = randomness
-		self.index = listIndex
-		#randomness is the chance to go in a random direction
+		#using default init
 
 	def getAlgType(self):
 		return "Reflex"
@@ -382,12 +372,10 @@ class Reflex(baseAlgorithm):
 			self.facing = pList[ranDir][2]
 			return pList[ranDir][0]
 
-
-		# get nearest opposing agent:self.wallList = c_map.get_map_bounds() + c_map.get_walls()
+		# get nearest opposing agent:
 		nearest = 9999999
 		for agent in self.agent_list:
 			# find closest agent's distance
-
 			agentVal = self.linDist(self.agent_pos, agent.getPos())
 			if (agentVal < nearest) and not(agent.getType() == self.agent.getType()):
 				nearest = agentVal
@@ -436,15 +424,9 @@ class Reflex(baseAlgorithm):
 			for agent in self.agent_list:
 				# find closest agent's distance
 				if not (agent.getType() == self.agent.getType()):
-					agentVal = self.linDist(pList[i][0], agent.getPos()) #and BFS here as well
+					agentVal = self.linDist(pList[i][0], agent.getPos()) #and BFSDist here as well
 
-				if (agentVal < bestVal):# and not(agent.getType() == self.agent.getType()):
-					# NOTE: this is currently set as a dedicated hunter-only
-					# algorithm.  only works for hunters chasing runners
-					# (to avoid chasing itself and not moving)
-					#
-					# SECONDARY: self.agent_list[self.lIndex].getType()
-					# isn't working properly with two hunters.
+				if (agentVal < bestVal):
 					bestVal = agentVal
 			pList[i] = ((pList[i][0]),bestVal,pList[i][2])
 			# the above loop should find the closest opposing agent to that
@@ -456,8 +438,6 @@ class Reflex(baseAlgorithm):
 			if ((pList[i][1]) < bestVal):
 				bestVal = pList[i][1]
 				bestIndex = i
-		#print("PL ", pList, " BI ", pList[bestIndex])
-
 		self.facing = pList[bestIndex][2]
 		return pList[bestIndex][0]
 
@@ -472,16 +452,13 @@ class DFS(baseAlgorithm):
 
 	def move(self, cur_pos):
 		# Caller function for dfs
-		return self.dfs(cur_pos, self.c_map, self.agents)
+		return self.dfs(cur_pos, self.c_map, self.agent_list)
 
 	def dfs(self, agent_pos, c_map, c_agent_list):
 		"""
 		Depth First Search algorithm.
-
 		:agent_pos: Current agent position, (x, y) tuple.
-
 		:c_map: Map object for obtaining walls, boundries, and safe zones.
-
 		:c_agent_list: List of agent objects for iterating through and finding next moves of each agent.
 		"""
 		# Keep track of each coordinate the agent looks at
@@ -492,7 +469,7 @@ class DFS(baseAlgorithm):
 
 		# Go through the list of agents and find where this agent is located on the map
 		current_pos = (agent_pos[0], agent_pos[1])
-		for agent in self.agents:
+		for agent in self.agent_list:
 			pos_form = agent.getPos()
 			if (pos_form[0] == current_pos[0]) and (pos_form[1] == current_pos[1]):
 				current_agent = agent
@@ -542,9 +519,11 @@ class BFS(baseAlgorithm):
 
 	def move(self, cur_pos):
 		# Caller function for bfs
-		if self.agents[self.lIndex].getType() == "hunter":
-			return self.hunterbfs(cur_pos)
-		return self.runnerbfs(cur_pos, self.c_map, self.agents)
+		if self.agent_list[self.index].getType() == "hunter":
+			return self.hunterbfs(cur_pos) 
+			# This finds value based on a BFS search between two squares
+			# doing this iteratively is SLOW
+		return self.runnerbfs(cur_pos, self.c_map, self.agent_list)
 
 	def hunterbfs(self, pPos):
 		pList = []
@@ -568,7 +547,6 @@ class BFS(baseAlgorithm):
 			self.facing = pList[ranDir][2]
 			return pList[ranDir][0]
 
-
 		# get nearest opposing agent:
 		nearest = 9999999
 		for agent in self.agent_list:
@@ -587,13 +565,7 @@ class BFS(baseAlgorithm):
 				if not (agent.getType() == self.agent.getType()):
 					agentVal = self.BFSDist(pList[i][0], agent.getPos())
 
-				if (agentVal < bestVal):# and not(agent.getType() == self.agent.getType()):
-					# NOTE: this is currently set as a dedicated hunter-only
-					# algorithm.  only works for hunters chasing runners
-					# (to avoid chasing itself and not moving)
-					#
-					# SECONDARY: self.agent_list[self.lIndex].getType()
-					# isn't working properly with two hunters.
+				if (agentVal < bestVal):
 					bestVal = agentVal
 			pList[i] = ((pList[i][0]),bestVal,pList[i][2])
 			# the above loop should find the closest opposing agent to that
@@ -605,10 +577,7 @@ class BFS(baseAlgorithm):
 			if ((pList[i][1]) < bestVal):
 				bestVal = pList[i][1]
 				bestIndex = i
-		#print("PL ", pList, " BI ", pList[bestIndex])
-
 		self.facing = pList[bestIndex][2]
-		#print("PL:", pList[bestIndex][0])
 		return pList[bestIndex][0]
 
 
@@ -624,7 +593,7 @@ class BFS(baseAlgorithm):
 		# Go through the list of agents and find where this agent is located on the map
 		current_pos = (agent_pos[0], agent_pos[1])
 
-		for agent in self.agents:
+		for agent in self.agent_list:
 			pos_form = agent.getPos()
 			if (pos_form[0] == current_pos[0]) and (pos_form[1] == current_pos[1]):
 				current_agent = agent
@@ -669,7 +638,7 @@ class Astar(baseAlgorithm):
 
 	def move(self, cur_pos):
 		self.agent = self.agent_list[self.index]
-		return self.Astar(cur_pos, self.c_map, self.agents)
+		return self.Astar(cur_pos, self.c_map, self.agent_list)
 
 	def heuristic(self, pos1, pos2):
 		# Change later to create a more sophisticated heuristic
