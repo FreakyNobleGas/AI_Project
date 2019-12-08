@@ -57,27 +57,6 @@ class agent(pygame.sprite.Sprite):
 
 		# Assign Agent Algorithm
 		self.setAlg(_algorithm)
-		'''if _algorithm.lower() == "dfs":
-			self.algorithm = DFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "bfs":
-			self.algorithm = BFS(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "astar" or _algorithm.lower() == "A*":
-			self.algorithm = Astar(self.agent_pos, self.c_map, c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "minmax":
-			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "expmax" or _algorithm.lower() == "expectimax":
-			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.lIndex)
-		elif _algorithm.lower() == "reflex":
-			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
-		elif _algorithm.lower() == "test":
-			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
-		elif _algorithm.lower() == "testmm":
-			self.algorithm = testMM(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
-		
-		else:
-			print("Using generic algorithms.")
-			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
-		'''
 
 		# Assign Image
 		print("Role: ", self.role)
@@ -99,7 +78,7 @@ class agent(pygame.sprite.Sprite):
 		elif alg.lower() == "bfs":
 			self.algorithm = BFS(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 		elif alg.lower() == "astar" or alg.lower() == "A*":
-			self.algorithm = Astar(self.agent_pos, self.c_map, self.lIndex)
+			self.algorithm = Astar(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 		elif alg.lower() == "minmax":
 			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 		elif alg.lower() == "expmax" or alg.lower() == "expectimax":
@@ -230,6 +209,7 @@ class agent(pygame.sprite.Sprite):
 
 	def changeTeam(self,alg):
 		self.teamChanged = 1
+		print("Alg: ",alg)
 		if self.role == "runner":
 			self.role = "hunter"
 			self.image = pygame.image.load('./images/r-arrow-small.png')
@@ -237,6 +217,7 @@ class agent(pygame.sprite.Sprite):
 			self.spriteR = 20 * self.sScale
 			self.image = pygame.transform.scale(self.image, (int(self.spriteR * 2), int(self.spriteR * 2)))
 			#self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
+			self.c_alg = alg
 			self.setAlg(alg)
 
 		else:

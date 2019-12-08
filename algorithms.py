@@ -81,6 +81,7 @@ class baseAlgorithm:
 		self.index = listIndex
 		self.lIndex = listIndex
 		self.moveList = []
+		self.rand = 0
 		#self.agent = self.agent_list[self.index]
 		#print("LI--",listIndex)
 
@@ -135,7 +136,7 @@ class baseAlgorithm:
 
 	def BFSDist(self, pPos, pos2):
 		# need to start a queue, and a Visited list
-		if self.manhattanDistance(pPos,pos2)>15:
+		if self.manhattanDistance(pPos,pos2)>150:
 			#print("Foo")
 			return self.manhattanDistance(pPos,pos2)
 		#print("No Foo")
@@ -416,7 +417,7 @@ class Reflex(baseAlgorithm):
 					# the closest step to the closest exit
 					bestVal = 99999999
 					for safe in self.c_map.get_safezone():
-						tempVal = self.BFSDist(pList[i][0],safe)
+						tempVal = self.linDist(pList[i][0],safe) #change for BFSDist here
 						#print("safe: ",safe," temp ",tempVal)
 						if  tempVal < bestVal:
 							bestVal = tempVal
@@ -435,7 +436,7 @@ class Reflex(baseAlgorithm):
 			for agent in self.agent_list:
 				# find closest agent's distance
 				if not (agent.getType() == self.agent.getType()):
-					agentVal = self.BFSDist(pList[i][0], agent.getPos())
+					agentVal = self.linDist(pList[i][0], agent.getPos()) #and BFS here as well
 
 				if (agentVal < bestVal):# and not(agent.getType() == self.agent.getType()):
 					# NOTE: this is currently set as a dedicated hunter-only
@@ -542,10 +543,77 @@ class BFS(baseAlgorithm):
 	def move(self, cur_pos):
 		# Caller function for bfs
 		if self.agents[self.lIndex].getType() == "hunter":
-			return self.bfs(cur_pos, self.c_map, self.agents)
-		return self.bfs(cur_pos, self.c_map, self.agents)
+			return self.hunterbfs(cur_pos)
+		return self.runnerbfs(cur_pos, self.c_map, self.agents)
+		
+	def hunterbfs(self, pPos):
+		pList = []
+		bestPos = 0
+		bestVal = 999999999
+		# up: 0 -1
+		# dn: 0 +1
+		# lf: -1 0
+		# rt: +1 0
+		pList = self.generateMovelist(pPos, 999999999,1)
 
-	def bfs(self, agent_pos, c_map, c_agent_list):
+		if len(pList) == 0: # if no valid moves currently, don't bother checking
+			return (pPos[0]),(pPos[1])
+		# all valid positions now in a list
+		# pList is [((x,y),manhattanDist),...]
+		# manhattanDist val is init as a very large value, vastly larger
+		# than expected max paths
+		if (self.rand >= (random.randrange(0,100,1))):
+			# random move with self.rand as the threshold
+			ranDir = random.randrange(0,len(pList),1)
+			self.facing = pList[ranDir][2]
+			return pList[ranDir][0]
+
+
+		# get nearest opposing agent:
+		nearest = 9999999
+		for agent in self.agent_list:
+			# find closest agent's distance
+
+			agentVal = self.linDist(self.agent_pos, agent.getPos())
+			if (agentVal < nearest) and not(agent.getType() == self.agent.getType()):
+				nearest = agentVal
+
+		# else keep going
+		for i in range(0,len(pList)):
+			# for each square, go through list of agents, finding the closest
+			bestVal = 99999999
+			for agent in self.agent_list:
+				# find closest agent's distance
+				if not (agent.getType() == self.agent.getType()):
+					agentVal = self.BFSDist(pList[i][0], agent.getPos())
+
+				if (agentVal < bestVal):# and not(agent.getType() == self.agent.getType()):
+					# NOTE: this is currently set as a dedicated hunter-only
+					# algorithm.  only works for hunters chasing runners
+					# (to avoid chasing itself and not moving)
+					#
+					# SECONDARY: self.agent_list[self.lIndex].getType()
+					# isn't working properly with two hunters.
+					bestVal = agentVal
+			pList[i] = ((pList[i][0]),bestVal,pList[i][2])
+			# the above loop should find the closest opposing agent to that
+			# position, and sets the value for the position being checked
+			# to that value
+		bestIndex = None
+		bestVal = 999999999
+		for i in range(0,len(pList)):
+			if ((pList[i][1]) < bestVal):
+				bestVal = pList[i][1]
+				bestIndex = i
+		#print("PL ", pList, " BI ", pList[bestIndex])
+
+		self.facing = pList[bestIndex][2]
+		#print("PL:", pList[bestIndex][0])
+		return pList[bestIndex][0]
+
+
+########################################
+	def runnerbfs(self, agent_pos, c_map, c_agent_list):
 		# Keep track of each coordinate the agent looks at
 		visited = []
 

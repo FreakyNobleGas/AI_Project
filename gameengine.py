@@ -175,12 +175,12 @@ class safeTile(wallTile):
 if __name__ == "__main__":
 	agentList = []
 	wallList = []
-	maplist = "huge.txt","complex2.txt","complex.txt",  "default.txt",  "empty-large.txt",  "pacman.txt",  "test.txt"
-	i = random.randint(0,6)
+	maplist = "pacman-large.txt","huge.txt","complex2.txt","complex.txt",  "default.txt",  "empty-large.txt",  "pacman.txt",  "test.txt"
+	i = random.randint(0,7)
 	chosenMap = "maps/"+maplist[i]
 	c_map = maps.Map(chosenMap, c_gameType = random.randint(0,1))#"maps/complex2.txt")
 	
-	for i in range(0,10):
+	for i in range(0,20):
 		r = random.randint(0,10)
 		if r == 0:
 			_role = "hunter"
@@ -196,10 +196,10 @@ if __name__ == "__main__":
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role, _index = (len(agentList)), _rand=10))
 		else:
 			_role = "runner"
-			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role = _role,  _index = (len(agentList))))
+			#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role = _role,  _index = (len(agentList))))
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "reflex", _role ="runner", _index = (len(agentList)), _rand=0))
-	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="runner", _index = (len(agentList))))
-	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "reflex", _role ="hunter", _index = (len(agentList)), _rand = 10))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="hunter", _index = (len(agentList))))
+	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter", _index = (len(agentList)), _rand = 10))
 	
 	wallList = [wallTile(i) for i in (c_map.get_walls()+c_map.get_map_bounds())] # Black Magic
 	safeList = [safeTile(i) for i in (c_map.get_safezone())] 
