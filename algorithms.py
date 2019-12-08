@@ -645,12 +645,8 @@ class Astar(baseAlgorithm):
 
 			print("action_list = ", action_list)
 			print("cost = ", cost)
-
 			print("position = ", position)
-
-			#print("Goal = ", c_map.get_safezone())
-			#exit()
-			print("isGoal = ", self.agent.isGoal((position[0], position[1])))
+			
 			if self.agent.isGoal((position[0], position[1])):
 				print("heeeeey")
 				return position
