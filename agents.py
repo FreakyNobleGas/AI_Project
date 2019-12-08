@@ -100,11 +100,11 @@ class agent(pygame.sprite.Sprite):
 		#self.agent_pos = self.algorithm.move()
 		# Possible way of doing persistant commands by checking for existing commands in the object.
 		if self.teamChanged:
-			# if team has changed (runner converted to hunter) clear 
+			# if team has changed (runner converted to hunter) clear
 			#the move list and reset teamChanged in case it changes back
 			self.com_mag = None
 			self.teamChanged = 0
-			
+
 		if not self.com_mag:
 			#print("self.agentpos",self.agent_pos)
 			move_result = self.algorithm.move(self.agent_pos)
@@ -123,7 +123,10 @@ class agent(pygame.sprite.Sprite):
 							a.changeTeam()
 						else:
 							print("no gameType ",self.c_map.getGameType(),"! ")
-			self.facing = self.algorithm.facing
+
+			# MinMax currently does not have a facing parameter
+			if type(self.algorithm) is not MinMax:
+				self.facing = self.algorithm.facing
 
 		# If move_result is a list of tupples set self.com_mag
 			if isinstance(move_result, list):
@@ -168,7 +171,7 @@ class agent(pygame.sprite.Sprite):
 			hunters = [agent for agent in self.agents if agent.role is 'hunter']
 
 		runners = [agent for agent in self.c_agent_list if agent.role is 'runner']
-		
+
 		# Check for role of agent then return true based on criteria
 		if self.role is 'hunter':
 			# Hunter criteria
@@ -191,7 +194,7 @@ class agent(pygame.sprite.Sprite):
 
 	def shouldDie(self):
 		return self.die
-		
+
 	def changeTeam(self):
 		self.teamChanged = 1
 		if self.role == "runner":
@@ -201,10 +204,10 @@ class agent(pygame.sprite.Sprite):
 			self.spriteR = 20 * self.sScale
 			self.image = pygame.transform.scale(self.image, (int(self.spriteR * 2), int(self.spriteR * 2)))
 			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.rand, self.lIndex)
-			
+
 		else:
 			self.role = "runner"
 			self.image = pygame.image.load('./images/b-arrow-small.png')
-	
+
 	def getAlg(self):
 		return self.algorithm

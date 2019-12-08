@@ -11,7 +11,6 @@
 import random
 import math
 
-
 # TODO: Create manhattan distance algorithm that accounts for walls
 class hunterEvalFunction:
 	# agentPositions holds a list of coordinates for each agent on the map
@@ -21,17 +20,18 @@ class hunterEvalFunction:
 		self.agentType = listOfAgents[agentIndex].getType()
 		self.agentPos = listOfAgents[agentIndex].getPos()
 		self.listOfAgents = listOfAgents
-		
+
 
 	def evaluate(self):
 		#self.agentPos = self.agentList[self.index].getPos()
 		total = 0
-		total = [agents.algorithm.linDist(self.agentPos, agents.getPos())
+		total = [agents.algorithm.BFSDist(self.agentPos, agents.getPos())
 				for agents in self.listOfAgents if (agents.getType() is not self.agentType)]
-		print("Total list: ", total)		
+		#print("Total list: ", total)
 		total = min(total)
-		print("hunter Total: ", total)
+		#print("Hunter Total: ", total)
 		return total
+		#return random.randrange(0,255,1)
 
 class runnerEvalFunction:
 	# agentPositions holds a list of coordinates for each agent on the map
@@ -45,16 +45,16 @@ class runnerEvalFunction:
 
 	def evaluate(self):
 		#print("1 = ", self.total)
-		self.total = [agents.algorithm.linDist(self.agentPos, agents.getPos())
+		self.total = [agents.algorithm.BFSDist(self.agentPos, agents.getPos())
 				for agents in self.listOfAgents if agents.getType() is not self.agentType]
 		self.total = min(self.total) * -1.0
 
-		totalSafeZone = [self.agent.algorithm.linDist(self.agentPos, coordinate) for coordinate in self.safeZones]
+		totalSafeZone = [self.agent.algorithm.BFSDist(self.agentPos, coordinate) for coordinate in self.safeZones]
 		self.total += (sum(totalSafeZone) * 0.5)
 
 		self.total -= 15.0
 		#print("2 = ", self.total)
-		print("runner Toal: ", self.total)
+		#print("Runner Total: ", self.total)
 		return self.total
 
 class worldState:
@@ -83,7 +83,7 @@ class baseAlgorithm:
 		self.moveList = []
 		#self.agent = self.agent_list[self.index]
 		#print("LI--",listIndex)
-		
+
 
 	def isValidMove(self,plannedPosition):
 		# takes a position, and returns if the move would collide with
@@ -112,10 +112,10 @@ class baseAlgorithm:
 		# this could be expanded to use diagonals, but may overly
 		#expand the scope of the project
 		None
-	
+
 	def getType(self):
 		return self.agent.getType()
-		
+
 	def genericMove(self,tempPos):
 		savedPos = (self.agent_pos[0],self.agent_pos[1])
 		self.agent_pos = (tempPos[0],tempPos[1])
@@ -131,8 +131,8 @@ class baseAlgorithm:
 		self.agent_pos = (savedPos[0],savedPos[1])
 		print("Self: ",self.agent_pos," Temp: ",temp[0])
 		return temp[0]
-			
-			
+
+
 	def BFSDist(self, pPos, pos2):
 		# need to start a queue, and a Visited list
 		if self.manhattanDistance(pPos,pos2)>15:
@@ -163,11 +163,6 @@ class baseAlgorithm:
 			#print("TL: ", tempList, " Dist ", distance)
 		return distance
 
-		
-			
-		
-
-
 	def generateMovelist(self, pPos, defaultValue = 999999999, randomize = 0):
 		#same method as Reflex
 		pList = []
@@ -184,10 +179,10 @@ class baseAlgorithm:
 		if randomize:
 			random.shuffle(pList)
 		return pList
-		
+
 	def generateMoves(self, pPos): #mostly for BSFDepth
 		pList = []
-		if self.isValidMove(((pPos[0]),(pPos[1]))): 
+		if self.isValidMove(((pPos[0]),(pPos[1]))):
 			pList.append(((pPos[0]),(pPos[1])))
 		if self.isValidMove(((pPos[0]),(pPos[1]-1))):
 			pList.append(((pPos[0]),(pPos[1]-1)))
@@ -200,7 +195,7 @@ class baseAlgorithm:
 		return pList
 
 ###############################
-	
+
 
 class genericAlgorithms(baseAlgorithm):
 	# This generic algorithm is a basic structure to show how to
@@ -340,7 +335,7 @@ class testAlgorithm(baseAlgorithm): # should remain unused.  For basic interface
 				bestIndex = i
 		#print("PL ", pLis7t, " BI ", pList[bestIndex])
 		return pList[bestIndex][0]
-		
+
 
 
 class Reflex(baseAlgorithm):
@@ -353,7 +348,7 @@ class Reflex(baseAlgorithm):
 		self.rand = randomness
 		self.index = listIndex
 		#randomness is the chance to go in a random direction
-	
+
 	def getAlgType(self):
 		return "Reflex"
 
@@ -391,12 +386,12 @@ class Reflex(baseAlgorithm):
 		nearest = 9999999
 		for agent in self.agent_list:
 			# find closest agent's distance
-			
+
 			agentVal = self.linDist(self.agent_pos, agent.getPos())
 			if (agentVal < nearest) and not(agent.getType() == self.agent.getType()):
 				nearest = agentVal
 				nearestAgent = agent
-	
+
 		# if hunter: move toward nearest runner, found above
 		# if runner, move toward exit unless hunter is too close
 		if self.getType() == "runner":
@@ -412,12 +407,12 @@ class Reflex(baseAlgorithm):
 				#print("Running", pList)
 				self.facing = pList[moveIndex][2]
 				return pList[moveIndex][0] # return the move most opposite of the hunter
-				
+
 			else: # head toward exit
 				currentBest = 999999999
 				currentIndex =  None
 				for i in range(0,len(pList)):
-					# for each square, go through list of agents, finding 
+					# for each square, go through list of agents, finding
 					# the closest step to the closest exit
 					bestVal = 99999999
 					for safe in self.c_map.get_safezone():
@@ -431,8 +426,8 @@ class Reflex(baseAlgorithm):
 					pList[i] = ((pList[i][0]),bestVal,pList[i][2])
 				self.facing = pList[currentIndex][2]
 				return pList[currentIndex][0]
-			
-			
+
+
 		# else keep going
 		for i in range(0,len(pList)):
 			# for each square, go through list of agents, finding the closest
@@ -447,12 +442,12 @@ class Reflex(baseAlgorithm):
 					# algorithm.  only works for hunters chasing runners
 					# (to avoid chasing itself and not moving)
 					#
-					# SECONDARY: self.agent_list[self.lIndex].getType() 
+					# SECONDARY: self.agent_list[self.lIndex].getType()
 					# isn't working properly with two hunters.
 					bestVal = agentVal
 			pList[i] = ((pList[i][0]),bestVal,pList[i][2])
-			# the above loop should find the closest opposing agent to that 
-			# position, and sets the value for the position being checked 
+			# the above loop should find the closest opposing agent to that
+			# position, and sets the value for the position being checked
 			# to that value
 		bestIndex = None
 		bestVal = 999999999
@@ -461,7 +456,7 @@ class Reflex(baseAlgorithm):
 				bestVal = pList[i][1]
 				bestIndex = i
 		#print("PL ", pList, " BI ", pList[bestIndex])
-		
+
 		self.facing = pList[bestIndex][2]
 		return pList[bestIndex][0]
 
@@ -540,7 +535,7 @@ class DFS(baseAlgorithm):
 
 class BFS(baseAlgorithm):
 	# using default init from baseAlgorithm
-	
+
 	def getAlgType(self):
 		return "BFS"
 
@@ -603,7 +598,7 @@ class BFS(baseAlgorithm):
 class Astar:
 	def __init__(self):
 		pass
-	
+
 	def getAlgType(self):
 		return "Astar"
 
@@ -640,15 +635,18 @@ class MinMax(baseAlgorithm):
 
 			#print("Current agent: ", current_agent)
 			actions = self.c_map.get_next(worldState.curPos(current_agent))
-			print("Action List: ",actions)
+			#print("Action List: ",actions)
 
 			for action in actions:
+				#print("action[0] = ", action[0])
 				successor = worldState.nextState(action[0], current_agent)
-				max_successors.append(helper(successor, current_depth, current_agent + 1))
-				print("min Max Successors: ",min(max_successors))
+				print("successor =", successor)
+				max_successors.append((helper(successor, current_depth, current_agent + 1), action))
+
 
 			# Might need to add code for when no actions are available
-
+			print("Max Successors: ", max_successors)
+			#exit()
 			return min(max_successors)
 
 
@@ -661,10 +659,9 @@ class MinMax(baseAlgorithm):
 			for action in actions:
 				successor = worldState.nextState(action[0], current_agent)
 				min_successors.append((helper(successor, current_depth, current_agent + 1), action))
-				print("MS: ",min_successors)
 
 			# Might need to add code for when no actions are available
-
+			print("Min Successors ", min_successors)
 			return max(min_successors)
 
 		def helper(worldState, current_depth, current_agent):
@@ -673,11 +670,15 @@ class MinMax(baseAlgorithm):
 				current_agent = 0
 
 			if (current_depth >= self.depth):
+				print("hi")
 				# TODO: Add state scoring
 				if self.new_list[current_agent].getType() is "runner":
-					self.new_list[current_agent].totalEvalScore = runnerEvalFunction(self.new_list, current_agent, self.new_list[current_agent].totalEvalScore).evaluate()
-					return self.new_list[current_agent].totalEvalScore
+					#self.new_list[current_agent].totalEvalScore = runnerEvalFunction(self.new_list, current_agent, self.new_list[current_agent].totalEvalScore).evaluate()
+					#return self.new_list[current_agent].totalEvalScore
+					print("runner eval = ", runnerEvalFunction(self.new_list, current_agent).evaluate())
+					return runnerEvalFunction(self.new_list, current_agent).evaluate()
 				else:
+					print("hunter eval = ", hunterEvalFunction(self.new_list, current_agent).evaluate())
 					return hunterEvalFunction(self.new_list, current_agent).evaluate()
 
 			if self.new_list[current_agent].getType() is self.indexAgentType:
@@ -686,12 +687,15 @@ class MinMax(baseAlgorithm):
 				return get_min(worldState, current_depth, current_agent)
 
 		best_score = helper(worldState, 0, 0)
-		print(best_score)
+
+		print("---------------------")
+		print(self.agents[self.lIndex].role ," best score = ", best_score)
+		print("best score = ", best_score[0][1])
 		return best_score[1]
 
 class ExpMax:
 	def __init__(self):
 		pass
-		
+
 	def getAlgType(self):
 		return "ExpMax"
