@@ -177,11 +177,19 @@ class agent(pygame.sprite.Sprite):
 			# Hunter criteria
 			for runner in runners:
 				#print("p: ",position," GP: ", runner.getPos())
+				#print("p type = ", type(position[1]), "gp type = ", type(runner.getPos()))
+
 				if position is runner.getPos():
+					return True
+
+				# Not sure why, but AStar Algorithm doesn't work without this conditional
+				temp = runner.getPos()
+				if position[0] == temp[0] and position[1] == temp[1]:
 					return True
 
 		elif self.role is 'runner':
 			# Runner criteria
+			print("p: ",position," SafeZones: ", self.c_map.get_safezone())
 			if position in self.c_map.get_safezone():
 				return True
 

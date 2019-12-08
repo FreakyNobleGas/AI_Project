@@ -10,6 +10,8 @@
 ###########################################################################
 import random
 import math
+import queue
+
 
 # TODO: Create manhattan distance algorithm that accounts for walls
 class hunterEvalFunction:
@@ -30,8 +32,8 @@ class hunterEvalFunction:
 		#print("Total list: ", total)
 		total = min(total)
 		#print("Hunter Total: ", total)
-		return total
-		#return random.randrange(0,255,1)
+		#return total
+		return random.randrange(0,255,1)
 
 class runnerEvalFunction:
 	# agentPositions holds a list of coordinates for each agent on the map
@@ -172,7 +174,7 @@ class baseAlgorithm:
 			pList.append((((pPos[0]),(pPos[1]-1)),defaultValue,1))
 		if self.isValidMove(((pPos[0]),(pPos[1]+1))):
 			pList.append((((pPos[0]),(pPos[1]+1)),defaultValue,3))
-		if self.isValidMove(((pPos[0]-1),(pPos[1]))):
+		if self.isValidMove(((pPos[0]-1),(pPos[1](baseAlgorithm)))):
 			pList.append((((pPos[0]-1),(pPos[1])),defaultValue,2))
 		if self.isValidMove(((pPos[0]+1),(pPos[1]))):
 			pList.append((((pPos[0]+1),(pPos[1])),defaultValue,0))
@@ -382,7 +384,7 @@ class Reflex(baseAlgorithm):
 			return pList[ranDir][0]
 
 
-		# get nearest opposing agent:
+		# get nearest opposing agent:self.wallList = c_map.get_map_bounds() + c_map.get_walls()
 		nearest = 9999999
 		for agent in self.agent_list:
 			# find closest agent's distance
@@ -541,8 +543,6 @@ class BFS(baseAlgorithm):
 
 	def move(self, cur_pos):
 		# Caller function for bfs
-		if self.agents[self.lIndex].getType() == "hunter":
-			return self.bfs(cur_pos, self.c_map, self.agents)
 		return self.bfs(cur_pos, self.c_map, self.agents)
 
 	def bfs(self, agent_pos, c_map, c_agent_list):
@@ -555,6 +555,7 @@ class BFS(baseAlgorithm):
 
 		# Go through the list of agents and find where this agent is located on the map
 		current_pos = (agent_pos[0], agent_pos[1])
+
 		for agent in self.agents:
 			pos_form = agent.getPos()
 			if (pos_form[0] == current_pos[0]) and (pos_form[1] == current_pos[1]):
@@ -595,9 +596,76 @@ class BFS(baseAlgorithm):
 					visited.append(move)
 					queue.append((move, direction))
 
-class Astar:
-	def __init__(self):
-		pass
+class Astar(baseAlgorithm):
+	# Use baseAlgorithm init function
+
+	def move(self, cur_pos):
+		self.agent = self.agent_list[self.index]
+		return self.Astar(cur_pos, self.c_map, self.agents)
+
+	def heuristic(self, pos1, pos2):
+		# Change later to create a more sophisticated heuristic
+		return self.manhattanDistance(pos1, pos2)
+
+	def Astar(self, agent_pos, c_map, c_agent_list):
+
+		# Priority Queue that pops the smallest priority first
+		a = queue.PriorityQueue()
+
+		# Keep track of the cost for each state
+		cost_history = {}
+		explored = []
+
+		# Set starting state to zero
+		cost_history[str(agent_pos)] = 0
+
+		# ((Agent Position, Actions to State, Cost of State), Total Cost up to State)
+		empty_list = []
+		a.put((agent_pos, empty_list, 0, 0))
+
+		i = 0
+		while True:
+			print("i = ", i)
+			i += 1
+
+			if i == 100:
+				exit()
+
+			if a.empty():
+				print("Error: Priority Queue is Empty!")
+				exit()
+
+			# Get state information from lowest priority state
+			# NEED TO CHECK
+			position, action_list, cost, total_cost = a.get()
+
+			if action_list is None:
+				action_list = []
+				print("creating empty list")
+
+			print("action_list = ", action_list)
+			print("cost = ", cost)
+
+			print("position = ", position)
+
+			#print("Goal = ", c_map.get_safezone())
+			#exit()
+			print("isGoal = ", self.agent.isGoal((position[0], position[1])))
+			if self.agent.isGoal((position[0], position[1])):
+				print("heeeeey")
+				return position
+
+			# Add coordinate to set of explored states
+			if position not in explored:
+				explored.append(position)
+
+				# Returns a ((x,y), direction) tuple
+				actions = self.c_map.get_next(position)
+
+				for action in actions:
+					cost_history[str(action[0])] = total_cost + self.heuristic(position, action[0])
+
+					a.put((action[0], action_list.append(action[0]), self.heuristic(position, action[0]), cost_history[str(action[0])]))
 
 	def getAlgType(self):
 		return "Astar"
@@ -608,6 +676,11 @@ class MinMax(baseAlgorithm):
 		self.current_pos = agent_pos
 		self.c_map = c_map
 		self.agents = c_agent_list
+		# For BFSDist algorithm
+		self.agent_list = c_agent_list
+		self.index = listIndex
+		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
+
 		self.lIndex = listIndex
 		self.depth = 2
 		#self.runner_list = [agent for agent in self.c_agentList if agent.getType() is 'runner']
@@ -670,7 +743,7 @@ class MinMax(baseAlgorithm):
 				current_agent = 0
 
 			if (current_depth >= self.depth):
-				print("hi")
+
 				# TODO: Add state scoring
 				if self.new_list[current_agent].getType() is "runner":
 					#self.new_list[current_agent].totalEvalScore = runnerEvalFunction(self.new_list, current_agent, self.new_list[current_agent].totalEvalScore).evaluate()
