@@ -73,18 +73,25 @@ class worldState:
 		return self.agentPositions[agent]
 
 class baseAlgorithm:
-	def __init__(self, agent_pos, c_map, c_agent_list = None, index = None, rand = 0):
+	def __init__(self, agent_pos, c_map, c_agent_list = None, index = None,rand = 0):
 		self.agent_pos = (agent_pos[0],agent_pos[1])
 		self.c_map = c_map
 		self.wallList = c_map.get_map_bounds() + c_map.get_walls()
 		self.facing = 0
 		self.agent_list = c_agent_list
-		#self.agents = c_agent_list
+		#self.agents = c_agent_list#
 		self.index = index
-		#self.lIndex = listIndex
+		#self.lIndex = index#
 		self.moveList = []
 		self.rand = rand
+		self.last = [None, None, self.agent_pos]
+		self.imagePath = './images/b-arrow-small.png'
+	
+	def getImage(self):
+		return self.imagePath
 
+	def setImage(self,imagePath):
+		self.imagePath = imagePath
 
 	def isValidMove(self,plannedPosition):
 		# takes a position, and returns if the move would collide with
@@ -134,16 +141,19 @@ class baseAlgorithm:
 		return temp[0]
 
 
-	def BFSDist(self, pPos, pos2):
+	def BFSDist(self, pPos, pos2, last = None):
 		# need to start a queue, and a Visited list
-		if self.manhattanDistance(pPos,pos2)>15:
+		if self.linDist(pPos,pos2)>20:
 			#print("Foo")
-			return self.manhattanDistance(pPos,pos2)
+			return self.linDist(pPos,pos2)
 		#print("No Foo")
 		visited = []
 		# find & return distance to target (depth
 		distance = 0
 		tempList = self.generateMoves(pPos) #generate first set of positions
+		#print("TL: ",tempList)
+		random.shuffle(tempList)
+		#print("TL: ",tempList)
 		#print(tempList)
 		while not (pos2 in tempList) and (distance < 30) :#and not (len(tempList)==0):#not len([item for item in tempList if item==pos2])==0:
 			#print("P2: ",pos2," TL: ",tempList)
@@ -162,6 +172,9 @@ class baseAlgorithm:
 				return distance#1000#if list is empty, exhausted possible moves without finding target
 
 			#print("TL: ", tempList, " Dist ", distance)
+		if distance >=29:
+			print("Max Distance")
+			return self.linDist(pPos,pos2) 
 		return distance
 
 	def generateMovelist(self, pPos, defaultValue = 999999999, randomize = 0):
@@ -344,6 +357,7 @@ class Reflex(baseAlgorithm):
 		return "Reflex"
 
 	def move(self,unusedPos=None):
+
 		# get best direction from current position
 		# then step in that direction
 		newPos = self.bestDir(self.agent_pos)
@@ -386,34 +400,39 @@ class Reflex(baseAlgorithm):
 		if self.getType() == "runner":
 			agentDist = 0
 			moveIndex = 0
-			if nearest < 5: # if too close run
-				for i in range(0,len(pList)):
-					tempDist = self.linDist(pList[i][0], nearestAgent.getPos())
-					pList[i] = ((pList[i][0]), tempDist,pList[i][2])
-					if tempDist > agentDist:
-						agentDist = tempDist
-						moveIndex = i
-				#print("Running", pList)
+			#if (nearest < 5): # if enemy too close plan to run
+			for i in range(0,len(pList)):
+				tempDist = self.linDist(pList[i][0], nearestAgent.getPos())
+				pList[i] = ((pList[i][0]), tempDist,pList[i][2])
+				if tempDist > agentDist:
+					agentDist = tempDist
+					moveIndex = i
+			#print("Running", pList)
+			self.facing = pList[moveIndex][2]
+			#return pList[moveIndex][0] # return the move most opposite of the hunter
+
+			#else: # head toward exit
+			currentBest = 999999999
+			currentIndex =  None
+			for i in range(0,len(pList)):
+				# for each square, go through list of agents, finding
+				# the closest step to the closest exit
+				bestVal = 99999999
+				for safe in self.c_map.get_safezone():
+					tempVal = self.linDist(pList[i][0],safe) #change for BFSDist here
+					#print("safe: ",safe," temp ",tempVal)
+					if  tempVal < bestVal:
+						bestVal = tempVal
+				if bestVal < currentBest:
+					currentBest = bestVal
+					currentIndex = i
+				pList[i] = ((pList[i][0]),bestVal,pList[i][2])
+			self.facing = pList[currentIndex][2]
+			#return pList[currentIndex][0]
+			if (nearest < 7) and (tempVal > 5):# if nearest is too close and not close enough to exit
 				self.facing = pList[moveIndex][2]
 				return pList[moveIndex][0] # return the move most opposite of the hunter
-
-			else: # head toward exit
-				currentBest = 999999999
-				currentIndex =  None
-				for i in range(0,len(pList)):
-					# for each square, go through list of agents, finding
-					# the closest step to the closest exit
-					bestVal = 99999999
-					for safe in self.c_map.get_safezone():
-						tempVal = self.linDist(pList[i][0],safe) #change for BFSDist here
-						#print("safe: ",safe," temp ",tempVal)
-						if  tempVal < bestVal:
-							bestVal = tempVal
-					if bestVal < currentBest:
-						currentBest = bestVal
-						currentIndex = i
-					pList[i] = ((pList[i][0]),bestVal,pList[i][2])
-				self.facing = pList[currentIndex][2]
+			else:
 				return pList[currentIndex][0]
 
 
@@ -518,14 +537,22 @@ class BFS(baseAlgorithm):
 		return "BFS"
 
 	def move(self, cur_pos):
+		#self.last.append(cur_pos)
 		# Caller function for bfs
 		if self.agent_list[self.index].getType() == "hunter":
-			return self.hunterbfs(cur_pos) 
+			result = self.hunterbfs(cur_pos) 
+			
 			# This finds value based on a BFS search between two squares
 			# doing this iteratively is SLOW
-		return self.runnerbfs(cur_pos, self.c_map, self.agent_list)
+		else:
+			result = self.runnerbfs(cur_pos, self.c_map, self.agent_list)
+		self.last[0] = self.last[1]
+		self.last[1] = self.last[2]
+		self.last[2] = cur_pos
+		return result
 
 	def hunterbfs(self, pPos):
+		override = 0
 		pList = []
 		bestPos = 0
 		bestVal = 999999999
@@ -534,7 +561,7 @@ class BFS(baseAlgorithm):
 		# lf: -1 0
 		# rt: +1 0
 		pList = self.generateMovelist(pPos, 999999999,1)
-
+		
 		if len(pList) == 0: # if no valid moves currently, don't bother checking
 			return (pPos[0]),(pPos[1])
 		# all valid positions now in a list
@@ -543,6 +570,7 @@ class BFS(baseAlgorithm):
 		# than expected max paths
 		if (self.rand >= (random.randrange(0,100,1))):
 			# random move with self.rand as the threshold
+			print("Random Move")
 			ranDir = random.randrange(0,len(pList),1)
 			self.facing = pList[ranDir][2]
 			return pList[ranDir][0]
@@ -557,26 +585,40 @@ class BFS(baseAlgorithm):
 				nearest = agentVal
 
 		# else keep going
+		# remove last square from possible valid moves		
+		if (self.last[0] is not "foo"):
+			#print(pList[1][0]," ",self.last[0])
+			for x in pList:
+				if (x[0] == self.last[0]) and (len(pList)>1):# and (pList[x][0][1] == self.last[0][1]) :
+					print("Remove Last")
+					pList.remove(x)
+					override = 1
+					
 		for i in range(0,len(pList)):
 			# for each square, go through list of agents, finding the closest
 			bestVal = 99999999
 			for agent in self.agent_list:
 				# find closest agent's distance
 				if not (agent.getType() == self.agent.getType()):
-					agentVal = self.BFSDist(pList[i][0], agent.getPos())
+					if override:
+						agentVal = self.linDist(pList[i][0], agent.getPos())
+					else:
+						agentVal = self.BFSDist(pList[i][0], agent.getPos())
 
 				if (agentVal < bestVal):
 					bestVal = agentVal
-			pList[i] = ((pList[i][0]),bestVal,pList[i][2])
+			pList[i] = ((pList[i][0]),bestVal,pList[i][2]) # update the value for agent list
 			# the above loop should find the closest opposing agent to that
 			# position, and sets the value for the position being checked
 			# to that value
+		
 		bestIndex = None
 		bestVal = 999999999
 		for i in range(0,len(pList)):
 			if ((pList[i][1]) < bestVal):
 				bestVal = pList[i][1]
 				bestIndex = i
+		#if (pList is not None) and (pList[bestIndex] is not None) and (pList[bestIndex][2] is not None):
 		self.facing = pList[bestIndex][2]
 		return pList[bestIndex][0]
 
