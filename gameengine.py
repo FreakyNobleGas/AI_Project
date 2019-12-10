@@ -183,7 +183,7 @@ if __name__ == "__main__":
 	for i in range(0,10):
 		r = random.randint(0,10)
 		if r == 0:
-			_role = "hunter"
+			_role = "runner"
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role = _role,  _index = (len(agentList)), _rand = 2))
 		elif r >=1 and r<=3:
 			_role = "runner"
@@ -199,7 +199,7 @@ if __name__ == "__main__":
 			agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "random", _role = _role,  _index = (len(agentList))))
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "AStar", _role ="runner", _index = (len(agentList)), _rand=0))
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="hunter", _index = (len(agentList))))
-	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="runner", _index = (len(agentList)), _rand = 1))
+	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter", _index = (len(agentList)), _rand = 1))
 	
 	wallList = [wallTile(i) for i in (c_map.get_walls()+c_map.get_map_bounds())] # Black Magic
 	safeList = [safeTile(i) for i in (c_map.get_safezone())] 

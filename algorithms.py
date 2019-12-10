@@ -86,6 +86,7 @@ class baseAlgorithm:
 		self.rand = rand
 		self.last = [None, None, self.agent_pos]
 		self.imagePath = './images/b-arrow-small.png'
+		self.agent = None
 	
 	def getImage(self):
 		return self.imagePath
@@ -143,9 +144,9 @@ class baseAlgorithm:
 
 	def BFSDist(self, pPos, pos2, last = None):
 		# need to start a queue, and a Visited list
-		if self.linDist(pPos,pos2)>20:
+		if self.linDist(pPos,pos2)>15:
 			#print("Foo")
-			return self.linDist(pPos,pos2)
+			return 5*self.linDist(pPos,pos2)
 		#print("No Foo")
 		visited = []
 		# find & return distance to target (depth
@@ -180,7 +181,8 @@ class baseAlgorithm:
 	def generateMovelist(self, pPos, defaultValue = 999999999, randomize = 0):
 		#same method as Reflex
 		pList = []
-		if self.isValidMove(((pPos[0]),(pPos[1]))): # don't move if current position is ideal
+		#if self.isValidMove(((pPos[0]),(pPos[1]))): # don't move if current position is ideal
+		if (self.agent is not None) and (self.agent.getType() == "runner"):
 			pList.append((((pPos[0]),(pPos[1])),defaultValue-1,-1))
 		if self.isValidMove(((pPos[0]),(pPos[1]-1))):
 			pList.append((((pPos[0]),(pPos[1]-1)),defaultValue,1))
@@ -414,6 +416,7 @@ class Reflex(baseAlgorithm):
 			#else: # head toward exit
 			currentBest = 999999999
 			currentIndex =  None
+			#print(pList)
 			for i in range(0,len(pList)):
 				# for each square, go through list of agents, finding
 				# the closest step to the closest exit
@@ -429,7 +432,7 @@ class Reflex(baseAlgorithm):
 				pList[i] = ((pList[i][0]),bestVal,pList[i][2])
 			self.facing = pList[currentIndex][2]
 			#return pList[currentIndex][0]
-			if (nearest < 7) and (tempVal > 5):# if nearest is too close and not close enough to exit
+			if (nearest < 7) and (currentBest > 5):# if nearest is too close and not close enough to exit
 				self.facing = pList[moveIndex][2]
 				return pList[moveIndex][0] # return the move most opposite of the hunter
 			else:
@@ -549,6 +552,7 @@ class BFS(baseAlgorithm):
 		self.last[0] = self.last[1]
 		self.last[1] = self.last[2]
 		self.last[2] = cur_pos
+
 		return result
 
 	def hunterbfs(self, pPos):
@@ -570,7 +574,7 @@ class BFS(baseAlgorithm):
 		# than expected max paths
 		if (self.rand >= (random.randrange(0,100,1))):
 			# random move with self.rand as the threshold
-			print("Random Move")
+			#print("Random Move")
 			ranDir = random.randrange(0,len(pList),1)
 			self.facing = pList[ranDir][2]
 			return pList[ranDir][0]
@@ -590,7 +594,7 @@ class BFS(baseAlgorithm):
 			#print(pList[1][0]," ",self.last[0])
 			for x in pList:
 				if (x[0] == self.last[0]) and (len(pList)>1):# and (pList[x][0][1] == self.last[0][1]) :
-					print("Remove Last")
+					#print("Remove Last")
 					pList.remove(x)
 					override = 1
 					
