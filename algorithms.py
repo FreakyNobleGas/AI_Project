@@ -24,7 +24,7 @@ class hunterEvalFunction:
 		self.listOfAgents = listOfAgents
 
 
-	def evaluate(self):
+	def evaluate(self, worldState):
 		#self.agentPos = self.agentList[self.index].getPos()
 		total = 0
 		total = [agents.algorithm.BFSDist(self.agentPos, agents.getPos())
@@ -45,19 +45,19 @@ class runnerEvalFunction:
 		self.safeZones = self.agent.algorithm.c_map.get_safezone()
 		self.total = total
 
-	def evaluate(self):
+	def evaluate(self, worldState):
 		#print("1 = ", self.total)
 		self.total = [agents.algorithm.BFSDist(self.agentPos, agents.getPos())
 				for agents in self.listOfAgents if agents.getType() is not self.agentType]
 		self.total = min(self.total) * -1.0
 
 		totalSafeZone = [self.agent.algorithm.BFSDist(self.agentPos, coordinate) for coordinate in self.safeZones]
-		self.total += (sum(totalSafeZone) * 0.5)
+		self.total += (sum(totalSafeZone) * 0.5) - min(totalSafeZone)
 
 		#self.total -= 15.0
 		#print("2 = ", self.total)
 		#print("Runner Total: ", self.total)
-		return self.total
+		return min(totalSafeZone)
 
 class worldState:
 	def __init__(self, agentPositions):
@@ -71,6 +71,37 @@ class worldState:
 	def curPos(self, agent):
 		#print("Current pos for agent: ", self.agentPositions[agent])
 		return self.agentPositions[agent]
+		
+	def hunterEval(self, cur_agent, listOfAgents):
+		total = []
+		agent = listOfAgents[cur_agent]
+		for agents in range(len(listOfAgents)): 
+			if listOfAgents[agents].getType() is not 'hunter':
+				total.append(agent.algorithm.manhattanDistance(self.curPos(cur_agent), self.curPos(agents)))
+		print ("Total: ", min(total))
+		return min(total) * -1
+		
+	def runnerEval(self, cur_agent, listOfAgents):
+		agent = listOfAgents[cur_agent]
+		safeZones = agent.algorithm.c_map.get_safezone()
+		totalSafeZone = [agent.algorithm.manhattanDistance(self.curPos(cur_agent), coordinate) for coordinate in safeZones]
+		hunter_pos_list = []
+		#print("safzone: ", min(totalSafeZone))
+		total = min(totalSafeZone) * -1
+		if self.curPos(cur_agent) in list(agent.visited.keys()):
+			print("Agent visit: ", agent.visited[self.curPos(cur_agent)])
+			#total -= agent.visited[self.curPos(cur_agent)]
+		
+		for agents in range(len(listOfAgents)):
+			if listOfAgents[agents].getType() is not 'runner':
+				hunter_pos_list.append(agent.algorithm.manhattanDistance(self.curPos(cur_agent), self.curPos(agents)))
+		
+		print(min(hunter_pos_list))
+		if min(hunter_pos_list) <= 1:
+			total += -2
+		print ("Total: ", total)
+		return total
+		
 
 class baseAlgorithm:
 	def __init__(self, agent_pos, c_map, c_agent_list = None, index = None,rand = 0):
@@ -144,7 +175,7 @@ class baseAlgorithm:
 
 	def BFSDist(self, pPos, pos2, last = None):
 		# need to start a queue, and a Visited list
-		if self.linDist(pPos,pos2)>15:
+		if self.linDist(pPos,pos2)<15:
 			#print("Foo")
 			return 5*self.linDist(pPos,pos2)
 		#print("No Foo")
@@ -173,8 +204,8 @@ class baseAlgorithm:
 				return distance#1000#if list is empty, exhausted possible moves without finding target
 
 			#print("TL: ", tempList, " Dist ", distance)
-		if distance >=29:
-			print("Max Distance")
+		if distance >= 29:
+			#print("Max Distance")
 			return self.linDist(pPos,pos2) 
 		return distance
 
@@ -792,15 +823,15 @@ class MinMax(baseAlgorithm):
 			for action in actions:
 				#print("action[0] = ", action[0])
 				successor = worldState.nextState(action[0], current_agent)
-				print("successor =", successor)
+				#print("successor =", successor)
 				max_successors.append((helper(successor, current_depth, current_agent + 1), action))
+				#max_successors.append(helper(successor, current_depth, current_agent + 1))
 
 
 			# Might need to add code for when no actions are available
-			print("Max Successors: ", max_successors)
+			#print("Max Successors: ", max_successors)
 			#exit()
 			return min(max_successors)
-
 
 		def get_max(worldState, current_depth, current_agent):
 			min_successors = []
@@ -809,11 +840,12 @@ class MinMax(baseAlgorithm):
 			actions = self.c_map.get_next(worldState.curPos(current_agent))
 
 			for action in actions:
+				#print("action[0] = ", action[0])
 				successor = worldState.nextState(action[0], current_agent)
 				min_successors.append((helper(successor, current_depth, current_agent + 1), action))
 
 			# Might need to add code for when no actions are available
-			print("Min Successors ", min_successors)
+			#print("Min Successors ", min_successors)
 			return max(min_successors)
 
 		def helper(worldState, current_depth, current_agent):
@@ -821,28 +853,36 @@ class MinMax(baseAlgorithm):
 				current_depth += 1
 				current_agent = 0
 
-			if (current_depth >= self.depth):
-
+			if (current_depth is self.depth):
 				# TODO: Add state scoring
-				if self.new_list[current_agent].getType() is "runner":
+				if self.new_list[0].getType() is "runner":
 					#self.new_list[current_agent].totalEvalScore = runnerEvalFunction(self.new_list, current_agent, self.new_list[current_agent].totalEvalScore).evaluate()
 					#return self.new_list[current_agent].totalEvalScore
-					print("runner eval = ", runnerEvalFunction(self.new_list, current_agent).evaluate())
-					return runnerEvalFunction(self.new_list, current_agent).evaluate()
+					#print("runner eval = ", runnerEvalFunction(self.new_list, current_agent).evaluate())
+					#return runnerEvalFunction(self.new_list, current_agent).evaluate(worldState)
+					return worldState.runnerEval(current_agent, self.new_list)
 				else:
-					print("hunter eval = ", hunterEvalFunction(self.new_list, current_agent).evaluate())
-					return hunterEvalFunction(self.new_list, current_agent).evaluate()
-
+					#print("hunter eval = ", hunterEvalFunction(self.new_list, current_agent).evaluate())
+					#return hunterEvalFunction(self.new_list, current_agent).evaluate(worldState)
+					return worldState.hunterEval(current_agent, self.new_list)
+			
 			if self.new_list[current_agent].getType() is self.indexAgentType:
 				return get_max(worldState, current_depth, current_agent)
 			else:
 				return get_min(worldState, current_depth, current_agent)
 
+		# Beginning of MinMax
 		best_score = helper(worldState, 0, 0)
 
-		print("---------------------")
-		print(self.agents[self.lIndex].role ," best score = ", best_score)
-		print("best score = ", best_score[0][1])
+		#print("---------------------")
+		#print(self.agents[self.lIndex].role ," best score = ", best_score)
+		#print("best score = ", best_score[1])
+		print ("Visited: ", self.agent_list[0].visited)
+		if best_score[1][0] not in list(self.agent_list[0].visited.keys()): 
+			self.new_list[0].visited[best_score[1][0]] = 1
+		else:
+			self.new_list[0].visited[best_score[1][0]] += 1
+		
 		return best_score[1]
 
 class ExpMax(baseAlgorithm):

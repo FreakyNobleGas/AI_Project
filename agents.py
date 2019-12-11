@@ -10,6 +10,7 @@
 ###########################################################################
 import random
 import pygame
+from datetime import datetime, timedelta
 from algorithms import *
 
 class agent(pygame.sprite.Sprite):
@@ -38,6 +39,7 @@ class agent(pygame.sprite.Sprite):
 		print("lInd- ",_index)
 		self.die = 0
 		self.teamChanged = 0
+		self.visited = {}
 
 		if self.agent_pos == None:
 			if self.role == "runner":
@@ -129,7 +131,13 @@ class agent(pygame.sprite.Sprite):
 
 		if not self.com_mag:
 			#print("self.agentpos",self.agent_pos)
+			# Algorithm time tracker
+			alg_start_time = datetime.now()
+			
 			move_result = self.algorithm.move(self.agent_pos)
+			
+			alg_end_time = datetime.now() - alg_start_time
+			
 			#print("Move result: ", move_result)
 
 			# kill or convert.  for now, kills on hunter tagging a runner

@@ -19,6 +19,15 @@ from interface import mainWindow
 from gameengine import gameEngine, wallTile, safeTile
 from maps import Map
 from agents import agent
+from datetime import datetime, timedelta
+
+class gameScore:
+	def __init__(self):
+		self.agentScoreMap = {}
+		self.gameTime = None
+		
+	def scoreGame(self):
+		pass
 
 class Driver:
     """
@@ -63,10 +72,13 @@ class Driver:
 
     def run_game(self, c_map, c_agents, c_alg):
         newMap, wallList, agentList, safeList = self.formatter(c_map, c_agents, c_alg)
+        # Game time tracker
+        game_start_time = datetime.now()
         gameEngine(agentList, wallList, newMap, safeList = safeList)
-
-
-
+        game_end_time = datetime.now() - game_start_time
+        print("Total run time: ", game_end_time)
+		
+		
 if __name__ == "__main__":
     # Parse Command Line Arguments
     parser = argparse.ArgumentParser()
