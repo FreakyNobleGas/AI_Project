@@ -743,6 +743,7 @@ class Astar(baseAlgorithm):
 		heappush(h, (0, (agent_pos, 0)))
 		i = 0
 		while True:
+			print("Explored = ", explored)
 			print("i = ", i)
 			i += 1
 
@@ -761,7 +762,7 @@ class Astar(baseAlgorithm):
 			total_cost = currentState[0]
 			position = currentState[1][0]
 			cost = currentState[1][1]
-			
+
 			print("Total Cost = ", total_cost)
 			print("Position = ", position)
 			print("Cost = ", cost)
