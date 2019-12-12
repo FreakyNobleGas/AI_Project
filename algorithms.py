@@ -717,9 +717,17 @@ class Astar(baseAlgorithm):
 		self.agent = self.agent_list[self.index]
 		return self.Astar(cur_pos, self.c_map, self.agent_list)
 
-	def heuristic(self, pos1, pos2):
+	def heuristic(self, pos1, listOfGoals):
 		# Change later to create a more sophisticated heuristic
-		return self.manhattanDistance(pos1, pos2)
+		#print("Pos1 = ", pos1)
+		#print("Pos2 = ", pos2)
+		#exit()
+		total = 0.0
+
+		for goals in listOfGoals:
+			total += self.manhattanDistance(pos1, goals)
+			
+		return total
 
 	def Astar(self, agent_pos, c_map, c_agent_list):
 		# Minheap
@@ -746,15 +754,15 @@ class Astar(baseAlgorithm):
 			historyOfActions = currentState[1][2]
 
 			# Debugging Statements
-			#print("Current State = ", currentState)
-			#print("Total Cost = ", total_cost)
-			#print("Position = ", position)
-			#print("Cost = ", cost)
+			print("Current State = ", currentState)
+			print("Total Cost = ", total_cost)
+			print("Position = ", position)
+			print("Cost = ", cost)
 			print("History of Actions = ", historyOfActions)
 
 			if self.agent.isGoal(position):
 				#print("Goal String = ", historyOfActions)
-				return historyOfActions[0]
+				return historyOfActions[2]
 
 			# Add coordinate to set of explored states
 			if position not in explored:
@@ -764,65 +772,14 @@ class Astar(baseAlgorithm):
 				actions = self.c_map.get_next(position)
 
 				for action in actions:
-					cost_history[str(action[0])] = total_cost + self.heuristic(position, action[0])
+					cost_history[str(action[0])] = total_cost + self.heuristic(action[0], self.agent.getGoalCoord())
 
 					if historyOfActions is None:
 						historyOfActions = [position]
 					else:
 						historyOfActions.append(position)
 
-					heappush(h, (cost_history[str(action[0])], ((action[0]), (self.heuristic(position, action[0])), (historyOfActions))))
-					
-	def test_astar(self, agent_pos, c_map, c_agent_list):
-		visited = []
-
-		# Keep track of the order we see coordinates so we can iterate through them
-		queue = []
-		path_map = {}
-
-		# Go through the list of agents and find where this agent is located on the map
-		current_pos = (agent_pos[0], agent_pos[1])
-
-		for agent in self.agent_list:
-			pos_form = agent.getPos()
-			if (pos_form[0] == current_pos[0]) and (pos_form[1] == current_pos[1]):
-				current_agent = agent
-
-		path_map[(current_pos,0)] = 'END'
-
-		# Add the agents current position to the list of visited and directions
-		visited.append(current_pos)
-		queue.append((current_pos, 0))
-
-		while queue:
-			# Grab the next coordinate in the queue
-			queue.sort()
-			current_pos = queue.pop(0)
-
-			# Returns all moves that are immediately possible for the current position
-			possible_moves = self.c_map.get_next(current_pos[0])
-
-			# Iterate through each move possible
-			for move, direction in possible_moves:
-				# Check if move is a goal state and if it is, then return list of
-				# instructions
-				if current_agent.isGoal(move):
-					#print('GOAL')
-					# Go through path map and create a list of instructions
-					path_map[(move, direction)] = (current_pos)
-					com = path_map[current_pos]
-					return_list = [(move, direction)]
-					while com is not 'END':
-						return_list.append(com)
-						com = path_map[com]
-					return_list.reverse()
-					return return_list
-
-				# If not goal state, then add to list of visited states, and continue looking
-				elif move not in visited:
-					path_map[(move, direction)] = (current_pos)
-					visited.append(move)
-					queue.append((move, direction))
+					heappush(h, (cost_history[str(action[0])], ((action[0]), (self.heuristic(action[0], self.agent.getGoalCoord())), (historyOfActions))))
 
 	def getAlgType(self):
 		return "Astar"

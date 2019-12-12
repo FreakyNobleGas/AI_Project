@@ -32,7 +32,7 @@ class agent(pygame.sprite.Sprite):
 		self.c_alg = c_alg
 		_algorithm = c_alg
 		self.algorithmName = "Not Initialized"
-		
+
 		# Game engine variables
 		self.image = _image
 		self.image2 = _image2
@@ -259,6 +259,19 @@ class agent(pygame.sprite.Sprite):
 
 		# Return False fallthrough
 		return False
+
+	def getGoalCoord(self):
+
+		if self.role is "runner":
+			return self.c_map.get_safezone()
+		else:
+			runnerCoord = []
+
+			for agents in range(len(self.c_agent_list)):
+				if self.c_agent_list[agents].getType() is not 'hunter':
+					runnerCoord.append(self.c_agent_list[agents].getPos())
+
+			return runnerCoord
 
 	def markForDeath(self):
 		self.die = 1
