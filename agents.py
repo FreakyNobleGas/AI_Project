@@ -24,7 +24,7 @@ class agent(pygame.sprite.Sprite):
 		self.agent_pos = _current_pos
 		self.role = _role
 		self.lIndex = _index
-		print("lInd- ",_index)
+		#print("lInd- ",_index)
 
 		# Game environement variables
 		self.c_map = c_map
@@ -70,7 +70,7 @@ class agent(pygame.sprite.Sprite):
 		self.setAlg(_algorithm)
 
 		# Assign Image
-		print("Role: ", self.role)
+		#print("Role: ", self.role)
 		'''if self.role == "hunter":
 			self.image = pygame.image.load('./images/r-arrow-small.png')
 		elif self.role == "runner":
@@ -202,7 +202,7 @@ class agent(pygame.sprite.Sprite):
 				#None
 				#print("MR: ",move_result)
 				self.agent_pos = move_result[0]
-				#self.facing = move_result[1]
+				self.facing = move_result[1]
 			else:# MR is a tuple
 				self.agent_pos = move_result
 

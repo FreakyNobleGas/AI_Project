@@ -20,14 +20,73 @@ from gameengine import gameEngine, wallTile, safeTile
 from maps import Map
 from agents import agent
 from datetime import datetime, timedelta
+import sys
 
-class gameScore:
-	def __init__(self):
+class GameScore:
+	def __init__(self, agents_list):
 		self.agentScoreMap = {}
 		self.gameTime = None
+		self.agents_list = agents_list
+		self.scoreGame()
+		self.printScore()
+		self.toFile()
 		
 	def scoreGame(self):
-		pass
+		r_count, h_count = 1, 1
+		
+		for agent in self.agents_list:
+			if agent.getType() is 'runner':
+				#self.agentScoreMap[agent.getType()] = (agent.c_alg, self.agentScore(agent))
+				self.agentScoreMap[agent.getType() + ' ' + str(r_count)] = (agent.c_alg, self.agentScore(agent))
+				r_count += 1
+			else:
+				#self.agentScoreMap[agent.getType()] = (agent.c_alg, self.agentScore(agent))
+				self.agentScoreMap[agent.getType() + ' ' + str(h_count)] = (agent.c_alg, self.agentScore(agent))
+				h_count += 1
+				
+	def agentScore(self, agent):
+		"""
+		Scoring elements in agents:
+		self.agentsKilled for hunters
+		self.timeAlive is datetime object for total time alive
+		self.endState  End state is how agent was ended the game (0 = alive at end, 1 = killed by hunter, 2 = safe zone exit, 3 = converted)
+		self.totalEvalScore = 0.0 ***Not used yet***
+		"""
+		total = 0
+		
+		if agent.getType() is 'runner':
+			try:
+				time = agent.timeAlive
+				total += int(timedelta(hours=time.hour, minutes=time.minute, seconds=time.second).total_seconds()) * 10.0
+			except:
+				total += int(agent.timeAlive.total_seconds()) * 10.0
+			
+			if agent.endState is 2:
+				total += 10000.0
+		else:
+			try:
+				time = agent.timeAlive
+				total -= int(timedelta(hours=time.hour, minutes=time.minute, seconds=time.second).total_seconds()) / 60.0
+			except:
+				total -= int(agent.timeAlive.total_seconds()) / 60.0
+			total += agent.agentsKilled * 1000.0
+		
+		return total
+		
+	def toFile(self):
+		map_name = self.agents_list[0].c_map.map_name.split('/')[-1]
+		map_name = map_name.replace('.txt','')
+		with open("gameData/game_output.csv", "a") as output:
+			for agent, values in self.agentScoreMap.items():
+				output.write(map_name + ", " + str(len(self.agents_list)) + ", " + agent.split(' ')[0] + ", " + values[0] + ", " + str(values[1]) + "\n")
+			output.close()
+		
+	def printScore(self):
+		map_name = self.agents_list[0].c_map.map_name.split('/')[-1]
+		map_name = map_name.replace('.txt','')
+		print("Map: " + map_name + ":")
+		for agent, values in self.agentScoreMap.items():
+			print(agent + " <" + values[0] + "> ---> SCORE(" + str(values[1]) + ")")
 
 class Driver:
     """
@@ -76,8 +135,9 @@ class Driver:
         game_start_time = datetime.now()
         gameEngine(agentList, wallList, newMap, safeList = safeList)
         game_end_time = datetime.now() - game_start_time
-        score_total = gameScore()
+        score_total = GameScore(agentList)
         print("Total run time: ", game_end_time)
+        sys.exit()
 		
 		
 if __name__ == "__main__":
