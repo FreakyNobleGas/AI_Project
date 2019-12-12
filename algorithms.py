@@ -726,7 +726,7 @@ class Astar(baseAlgorithm):
 
 		for goals in listOfGoals:
 			total += self.manhattanDistance(pos1, goals)
-			
+
 		return total
 
 	def Astar(self, agent_pos, c_map, c_agent_list):
@@ -754,15 +754,27 @@ class Astar(baseAlgorithm):
 			historyOfActions = currentState[1][2]
 
 			# Debugging Statements
-			print("Current State = ", currentState)
-			print("Total Cost = ", total_cost)
-			print("Position = ", position)
-			print("Cost = ", cost)
-			print("History of Actions = ", historyOfActions)
+			#print("Current State = ", currentState)
+			#print("Total Cost = ", total_cost)
+			#print("Position = ", position)
+			#print("Cost = ", cost)
+			#print("History of Actions = ", historyOfActions)
+			#exit()
 
 			if self.agent.isGoal(position):
-				#print("Goal String = ", historyOfActions)
-				return historyOfActions[2]
+				temp = historyOfActions[0]
+
+				# Find first none repeating coordinate to return as agents next move. This is most
+				# likely a result of Python returning unexpected coordinate pairs in historyOfActions
+				i = 0
+				while (i < len(historyOfActions)) and (historyOfActions[i][0] is temp[0]):
+					i += 1
+
+				# If all coordinates are the same, return it
+				if i >= len(historyOfActions):
+					i -= 1
+
+				return historyOfActions[i]
 
 			# Add coordinate to set of explored states
 			if position not in explored:
