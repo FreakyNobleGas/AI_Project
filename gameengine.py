@@ -152,13 +152,13 @@ class gameEngine():
 		font = pygame.font.Font('freesansbold.ttf', 24)
 
 		# Runner Header
-		runnerText = font.render("Runners:", True, green, blue)
+		runnerText = font.render("Runners:", True, blue, green)
 		runnerHeader = runnerText.get_rect()
 		runnerHeader.center = ((gameWindow[0] + 10)*2*spriteR, 20)
 		screen.blit(runnerText, runnerHeader)
 
 		# Hunter Header
-		hunterText = font.render("Hunters:", True, green, blue)
+		hunterText = font.render("Hunters:", True, red, green)
 		hunterHeader = hunterText.get_rect()
 		hunterHeader.center = ((gameWindow[0] + 30)*2*spriteR, 20)
 		screen.blit(hunterText, hunterHeader)
@@ -170,7 +170,7 @@ class gameEngine():
 		yBuffer = 45
 		for agents in self.agentsList:
 			if agents.getType() == "runner":
-				text = font.render("Runner " + str(i) + " + " + agents.getAlgName(), True, green, blue)
+				text = font.render("Runner " + str(i) + ": " + agents.getAlgName(), True, blue, green)
 				textRect = text.get_rect()
 				textRect.center = ((gameWindow[0] + 4)*2*spriteR, yBuffer)
 				i += 1
@@ -182,7 +182,7 @@ class gameEngine():
 		yBuffer = 45
 		for agents in self.agentsList:
 			if agents.getType() == "hunter":
-				text = font.render("Hunter " + str(i), True, green, blue)
+				text = font.render("Hunter " + str(i) + ": " + agents.getAlgName(), True, red, green)
 				textRect = text.get_rect()
 				textRect.center = ((gameWindow[0] + 22)*2*spriteR, yBuffer)
 				i += 1
