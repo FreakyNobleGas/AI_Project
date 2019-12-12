@@ -163,10 +163,9 @@ class gameEngine():
 		hunterHeader.center = ((gameWindow[0] + 30)*2*spriteR, 20)
 		screen.blit(hunterText, hunterHeader)
 
-		# Add Runners
-		print("agents list = ", self.agentsList)
 		font = pygame.font.Font('freesansbold.ttf', 20)
 
+		# Add Runners
 		i = 1
 		yBuffer = 45
 		for agents in self.agentsList:
@@ -178,6 +177,7 @@ class gameEngine():
 				yBuffer += 30
 				screen.blit(text, textRect)
 
+		# Add Hunters
 		i = 1
 		yBuffer = 45
 		for agents in self.agentsList:
