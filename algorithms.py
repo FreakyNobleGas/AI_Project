@@ -718,9 +718,17 @@ class Astar(baseAlgorithm):
 		self.agent = self.agent_list[self.index]
 		return self.Astar(cur_pos, self.c_map, self.agent_list)
 
-	def heuristic(self, pos1, pos2):
+	def heuristic(self, pos1, listOfGoals):
 		# Change later to create a more sophisticated heuristic
-		return self.manhattanDistance(pos1, pos2)
+		#print("Pos1 = ", pos1)
+		#print("Pos2 = ", pos2)
+		#exit()
+		total = 0.0
+
+		for goals in listOfGoals:
+			total += self.manhattanDistance(pos1, goals)
+			
+		return total
 
 	def Astar(self, agent_pos, c_map, c_agent_list):
 		# Minheap
@@ -747,15 +755,15 @@ class Astar(baseAlgorithm):
 			historyOfActions = currentState[1][2]
 
 			# Debugging Statements
-			#print("Current State = ", currentState)
-			#print("Total Cost = ", total_cost)
-			#print("Position = ", position)
-			#print("Cost = ", cost)
-			#print("History of Actions = ", historyOfActions)
+			print("Current State = ", currentState)
+			print("Total Cost = ", total_cost)
+			print("Position = ", position)
+			print("Cost = ", cost)
+			print("History of Actions = ", historyOfActions)
 
 			if self.agent.isGoal(position):
 				#print("Goal String = ", historyOfActions)
-				return historyOfActions[0]
+				return historyOfActions[2]
 
 			# Add coordinate to set of explored states
 			if position not in explored:
@@ -765,14 +773,14 @@ class Astar(baseAlgorithm):
 				actions = self.c_map.get_next(position)
 
 				for action in actions:
-					cost_history[str(action[0])] = total_cost + self.heuristic(position, action[0])
+					cost_history[str(action[0])] = total_cost + self.heuristic(action[0], self.agent.getGoalCoord())
 
 					if historyOfActions is None:
 						historyOfActions = [position]
 					else:
 						historyOfActions.append(position)
 
-					heappush(h, (cost_history[str(action[0])], ((action[0]), (self.heuristic(position, action[0])), (historyOfActions))))
+					heappush(h, (cost_history[str(action[0])], ((action[0]), (self.heuristic(action[0], self.agent.getGoalCoord())), (historyOfActions))))
 
 	def getAlgType(self):
 		return "Astar"
