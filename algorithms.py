@@ -723,11 +723,8 @@ class Astar(baseAlgorithm):
 		return self.manhattanDistance(pos1, pos2)
 
 	def Astar(self, agent_pos, c_map, c_agent_list):
-
+		# Minheap
 		h = []
-
-		# Priority Queue that pops the smallest priority first
-		#a = queue.PriorityQueue()
 
 		# Keep track of the cost for each state
 		cost_history = {}
@@ -736,49 +733,29 @@ class Astar(baseAlgorithm):
 		# Set starting state to zero
 		cost_history[str(agent_pos)] = 0
 
-		# ((Agent Position, Actions to State, Cost of State), Total Cost up to State)
-		empty_list = []
-		#a.put((agent_pos, empty_list, 0, 0))
+		# (Total Cost, (Position, Cost, History of Actions))
+		heappush(h, (0, (agent_pos, 0, ([agent_pos]))))
 
-		heappush(h, (0, (agent_pos, 0)))
-		i = 0
 		while True:
-			print("Explored = ", explored)
-			print("i = ", i)
-			i += 1
-
-			#if i == 100:
-			#	exit()
-
-			#if a.empty():
-			#	print("Error: Priority Queue is Empty!")
-			#	exit()
 
 			# Get state information from lowest priority state
-			# NEED TO CHECK
-			#position, action_list, cost, total_cost = a.get()
 			currentState = heappop(h)
-			print("Current State = ", currentState)
+
 			total_cost = currentState[0]
 			position = currentState[1][0]
 			cost = currentState[1][1]
+			historyOfActions = currentState[1][2]
 
-			print("Total Cost = ", total_cost)
-			print("Position = ", position)
-			print("Cost = ", cost)
+			# Debugging Statements
+			#print("Current State = ", currentState)
+			#print("Total Cost = ", total_cost)
+			#print("Position = ", position)
+			#print("Cost = ", cost)
+			#print("History of Actions = ", historyOfActions)
 
-
-			#if action_list is None:
-			#	action_list = []
-			#	print("creating empty list")
-
-			#print("action_list = ", action_list)
-			#print("cost = ", cost)
-			#print("position = ", position)
-
-			if self.agent.isGoal((position[0], position[1])):
-				print("Found goal!")
-				return position
+			if self.agent.isGoal(position):
+				#print("Goal String = ", historyOfActions)
+				return historyOfActions[0]
 
 			# Add coordinate to set of explored states
 			if position not in explored:
@@ -786,13 +763,16 @@ class Astar(baseAlgorithm):
 
 				# Returns a ((x,y), direction) tuple
 				actions = self.c_map.get_next(position)
-				print("Actions = ", actions)
 
 				for action in actions:
 					cost_history[str(action[0])] = total_cost + self.heuristic(position, action[0])
 
-					#a.put((action[0], action_list.append(action[0]), self.heuristic(position, action[0]), cost_history[str(action[0])]))
-					heappush(h, (cost_history[str(action[0])], ((action[0]), (self.heuristic(position, action[0])))))
+					if historyOfActions is None:
+						historyOfActions = [position]
+					else:
+						historyOfActions.append(position)
+
+					heappush(h, (cost_history[str(action[0])], ((action[0]), (self.heuristic(position, action[0])), (historyOfActions))))
 
 	def getAlgType(self):
 		return "Astar"
