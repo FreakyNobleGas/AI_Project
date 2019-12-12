@@ -22,24 +22,35 @@ class agent(pygame.sprite.Sprite):
 
 		# Create Object Variables
 		self.agent_pos = _current_pos
+		self.role = _role
+		self.lIndex = _index
+		print("lInd- ",_index)
+		
+		# Game environement variables
 		self.c_map = c_map
 		self.c_agent_list = c_agent_list
 		self.c_alg = c_alg
-		self.role = _role
+		_algorithm = c_alg
+		
+		# Game engine variables
 		self.image = _image
 		self.image2 = _image2
 		self.sScale = .5
 		self.spriteR = 20 * self.sScale
-		self.com_mag = None
-		_algorithm = c_alg
 		self.facing = 0
 		self.rand = _rand
-		self.lIndex = _index
-		self.totalEvalScore = 0.0
-		print("lInd- ",_index)
 		self.die = 0
 		self.teamChanged = 0
+		
+		# Algorithm variables
+		self.com_mag = None
 		self.visited = {}
+		
+		# Scoring variables
+		self.agentsKilled = 0
+		self.timeAlive = None
+		self.endState = 0	# End state is how agent was ended the game (0 = alive at end, 1 = killed by hunter, 2 = safe zone exit, 3 = converted)
+		self.totalEvalScore = 0.0
 
 		if self.agent_pos == None:
 			if self.role == "runner":
@@ -143,14 +154,20 @@ class agent(pygame.sprite.Sprite):
 			# kill or convert.  for now, kills on hunter tagging a runner
 			if self.getType() == "hunter":
 				for a in self.c_agent_list:
-					if (a.getType() is not "hunter") and (1.5>= self.algorithm.linDist(self.getPos(),a.getPos())):
+					if (a.getType() is not "hunter") and (1.5 >= self.algorithm.linDist(self.getPos(),a.getPos())):
 						# a.markForDeath, a.kill() used to kill runners
 						if self.c_map.getGameType() == 0: # kill runners, default
+							self.agentsKilled += 1
 							a.markForDeath()
 							a.kill()
+							a.endState = 1
+							a.timeAlive = datetime.now() - a.timeAlive
 						# a.changeTeam() converts them into Reflex hunters
 						elif self.c_map.getGameType() == 1: # convert runners
 							a.changeTeam(self.c_alg)
+							self.agentsKilled += 1
+							a.endState = 3
+							a.timeAlive = datetime.now() - a.timeAlive
 						else:
 							print("no gameType ",self.c_map.getGameType(),"! ")
 
