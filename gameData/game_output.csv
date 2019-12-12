@@ -1,3 +1,15 @@
 test, 3, hunter, minmax, 302.3666666666667
 test, 3, hunter, minmax, -697.6333333333333
 test, 3, runner, minmax, 90.0
+complex, 2, hunter, minmax, -708.2
+complex, 2, runner, minmax, 424920.0
+complex2, 2, hunter, minmax, -717.1333333333333
+complex2, 2, runner, minmax, 430280.0
+complex2, 2, hunter, bfs, 282.58333333333337
+complex2, 2, runner, bfs, 10.0
+complex2, 2, hunter, dfs, -719.4333333333333
+complex2, 2, runner, dfs, 431660.0
+complex2, 4, hunter, bfs, -719.95
+complex2, 4, hunter, bfs, 1280.05
+complex2, 4, runner, bfs, 60.0
+complex2, 4, runner, bfs, 60.0
