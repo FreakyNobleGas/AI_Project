@@ -76,6 +76,7 @@ class Driver:
         game_start_time = datetime.now()
         gameEngine(agentList, wallList, newMap, safeList = safeList)
         game_end_time = datetime.now() - game_start_time
+        score_total = gameScore()
         print("Total run time: ", game_end_time)
 		
 		

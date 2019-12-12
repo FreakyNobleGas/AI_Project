@@ -100,7 +100,8 @@ class worldState:
 		if min(hunter_pos_list) <= 1:
 			total += -2
 		print ("Total: ", total)
-		return total
+		#return total
+		return 0
 		
 
 class baseAlgorithm:
@@ -831,7 +832,10 @@ class MinMax(baseAlgorithm):
 			# Might need to add code for when no actions are available
 			#print("Max Successors: ", max_successors)
 			#exit()
-			return min(max_successors)
+			if max_successors:
+				return min(max_successors)
+			else:
+				return (0,((-1,-1),0))
 
 		def get_max(worldState, current_depth, current_agent):
 			min_successors = []
@@ -846,7 +850,10 @@ class MinMax(baseAlgorithm):
 
 			# Might need to add code for when no actions are available
 			#print("Min Successors ", min_successors)
-			return max(min_successors)
+			if min_successors:
+				return max(min_successors)
+			else:
+				return (0,((-1,-1),0))
 
 		def helper(worldState, current_depth, current_agent):
 			if current_agent is len(self.new_list):

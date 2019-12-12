@@ -21,6 +21,7 @@ import os.path
 import pygame
 import agents
 import maps
+from datetime import datetime, timedelta
 
 
 sScale =.5
@@ -80,6 +81,7 @@ class gameEngine():
 			agentGroup.add(i)
 			if i.getType() == "runner":
 				totalRunners +=1
+			i.timeAlive = datetime.now()
 
 		gameOver = 0
 		cycleLimit = 10000
