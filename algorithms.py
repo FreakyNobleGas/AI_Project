@@ -747,8 +747,8 @@ class Astar(baseAlgorithm):
 			print("i = ", i)
 			i += 1
 
-			if i == 100:
-				exit()
+			#if i == 100:
+			#	exit()
 
 			#if a.empty():
 			#	print("Error: Priority Queue is Empty!")
@@ -786,12 +786,13 @@ class Astar(baseAlgorithm):
 
 				# Returns a ((x,y), direction) tuple
 				actions = self.c_map.get_next(position)
+				print("Actions = ", actions)
 
 				for action in actions:
 					cost_history[str(action[0])] = total_cost + self.heuristic(position, action[0])
 
 					#a.put((action[0], action_list.append(action[0]), self.heuristic(position, action[0]), cost_history[str(action[0])]))
-					heappush(h, (cost_history[str(action[0])], (position, self.heuristic(position, action[0]))))
+					heappush(h, (cost_history[str(action[0])], ((action[0]), (self.heuristic(position, action[0])))))
 
 	def getAlgType(self):
 		return "Astar"
