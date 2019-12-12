@@ -24,7 +24,7 @@ class hunterEvalFunction:
 		self.listOfAgents = listOfAgents
 
 
-	def evaluate(self, worldState):
+	def evaluate(self):
 		#self.agentPos = self.agentList[self.index].getPos()
 		total = 0
 		total = [agents.algorithm.BFSDist(self.agentPos, agents.getPos())
@@ -45,7 +45,7 @@ class runnerEvalFunction:
 		self.safeZones = self.agent.algorithm.c_map.get_safezone()
 		self.total = total
 
-	def evaluate(self, worldState):
+	def evaluate(self):
 		#print("1 = ", self.total)
 		self.total = [agents.algorithm.BFSDist(self.agentPos, agents.getPos())
 				for agents in self.listOfAgents if agents.getType() is not self.agentType]
