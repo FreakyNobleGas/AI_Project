@@ -222,8 +222,6 @@ class safeTile(wallTile):
 		self.rect = pygame.Rect(self.wallPos[0]*2*spriteR,self.wallPos[1]*2*spriteR, spriteR, spriteR)
 		#rest of functionality pulled from wallTile, as other than init is identical
 
-
-
 #on run, ultimately should loop until win/loss
 #loop should iterate each agent one step, then redraw screen
 #code below is a basic implementation

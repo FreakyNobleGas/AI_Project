@@ -11,7 +11,7 @@
 import random
 import math
 import queue
-
+from heapq import *
 
 # TODO: Create manhattan distance algorithm that accounts for walls
 class hunterEvalFunction:
@@ -71,16 +71,16 @@ class worldState:
 	def curPos(self, agent):
 		#print("Current pos for agent: ", self.agentPositions[agent])
 		return self.agentPositions[agent]
-		
+
 	def hunterEval(self, cur_agent, listOfAgents):
 		total = []
 		agent = listOfAgents[cur_agent]
-		for agents in range(len(listOfAgents)): 
+		for agents in range(len(listOfAgents)):
 			if listOfAgents[agents].getType() is not 'hunter':
 				total.append(agent.algorithm.manhattanDistance(self.curPos(cur_agent), self.curPos(agents)))
 		print ("Total: ", min(total))
 		return min(total) * -1
-		
+
 	def runnerEval(self, cur_agent, listOfAgents):
 		agent = listOfAgents[cur_agent]
 		safeZones = agent.algorithm.c_map.get_safezone()
@@ -91,18 +91,18 @@ class worldState:
 		if self.curPos(cur_agent) in list(agent.visited.keys()):
 			print("Agent visit: ", agent.visited[self.curPos(cur_agent)])
 			#total -= agent.visited[self.curPos(cur_agent)]
-		
+
 		for agents in range(len(listOfAgents)):
 			if listOfAgents[agents].getType() is not 'runner':
 				hunter_pos_list.append(agent.algorithm.manhattanDistance(self.curPos(cur_agent), self.curPos(agents)))
-		
+
 		print(min(hunter_pos_list))
 		if min(hunter_pos_list) <= 1:
 			total += -2
 		print ("Total: ", total)
 		#return total
 		return 0
-		
+
 
 class baseAlgorithm:
 	def __init__(self, agent_pos, c_map, c_agent_list = None, index = None,rand = 0):
@@ -119,7 +119,7 @@ class baseAlgorithm:
 		self.last = [None, None, self.agent_pos]
 		self.imagePath = './images/b-arrow-small.png'
 		self.agent = None
-	
+
 	def getImage(self):
 		return self.imagePath
 
@@ -207,7 +207,7 @@ class baseAlgorithm:
 			#print("TL: ", tempList, " Dist ", distance)
 		if distance >= 29:
 			#print("Max Distance")
-			return self.linDist(pPos,pos2) 
+			return self.linDist(pPos,pos2)
 		return distance
 
 	def generateMovelist(self, pPos, defaultValue = 999999999, randomize = 0):
@@ -575,8 +575,8 @@ class BFS(baseAlgorithm):
 		#self.last.append(cur_pos)
 		# Caller function for bfs
 		if self.agent_list[self.index].getType() == "hunter":
-			result = self.hunterbfs(cur_pos) 
-			
+			result = self.hunterbfs(cur_pos)
+
 			# This finds value based on a BFS search between two squares
 			# doing this iteratively is SLOW
 		else:
@@ -597,7 +597,7 @@ class BFS(baseAlgorithm):
 		# lf: -1 0
 		# rt: +1 0
 		pList = self.generateMovelist(pPos, 999999999,1)
-		
+
 		if len(pList) == 0: # if no valid moves currently, don't bother checking
 			return (pPos[0]),(pPos[1])
 		# all valid positions now in a list
@@ -621,7 +621,7 @@ class BFS(baseAlgorithm):
 				nearest = agentVal
 
 		# else keep going
-		# remove last square from possible valid moves		
+		# remove last square from possible valid moves
 		if (self.last[0] is not "foo"):
 			#print(pList[1][0]," ",self.last[0])
 			for x in pList:
@@ -629,7 +629,7 @@ class BFS(baseAlgorithm):
 					#print("Remove Last")
 					pList.remove(x)
 					override = 1
-					
+
 		for i in range(0,len(pList)):
 			# for each square, go through list of agents, finding the closest
 			bestVal = 99999999
@@ -647,7 +647,7 @@ class BFS(baseAlgorithm):
 			# the above loop should find the closest opposing agent to that
 			# position, and sets the value for the position being checked
 			# to that value
-		
+
 		bestIndex = None
 		bestVal = 999999999
 		for i in range(0,len(pList)):
@@ -712,8 +712,8 @@ class BFS(baseAlgorithm):
 					queue.append((move, direction))
 
 class Astar(baseAlgorithm):
-	# Use baseAlgorithm init function
 
+	# Use baseAlgorithm init function
 	def move(self, cur_pos):
 		self.agent = self.agent_list[self.index]
 		return self.Astar(cur_pos, self.c_map, self.agent_list)
@@ -724,8 +724,10 @@ class Astar(baseAlgorithm):
 
 	def Astar(self, agent_pos, c_map, c_agent_list):
 
+		h = []
+
 		# Priority Queue that pops the smallest priority first
-		a = queue.PriorityQueue()
+		#a = queue.PriorityQueue()
 
 		# Keep track of the cost for each state
 		cost_history = {}
@@ -736,8 +738,9 @@ class Astar(baseAlgorithm):
 
 		# ((Agent Position, Actions to State, Cost of State), Total Cost up to State)
 		empty_list = []
-		a.put((agent_pos, empty_list, 0, 0))
+		#a.put((agent_pos, empty_list, 0, 0))
 
+		heappush(h, (0, (agent_pos, 0)))
 		i = 0
 		while True:
 			print("i = ", i)
@@ -746,24 +749,34 @@ class Astar(baseAlgorithm):
 			if i == 100:
 				exit()
 
-			if a.empty():
-				print("Error: Priority Queue is Empty!")
-				exit()
+			#if a.empty():
+			#	print("Error: Priority Queue is Empty!")
+			#	exit()
 
 			# Get state information from lowest priority state
 			# NEED TO CHECK
-			position, action_list, cost, total_cost = a.get()
+			#position, action_list, cost, total_cost = a.get()
+			currentState = heappop(h)
+			print("Current State = ", currentState)
+			total_cost = currentState[0]
+			position = currentState[1][0]
+			cost = currentState[1][1]
+			
+			print("Total Cost = ", total_cost)
+			print("Position = ", position)
+			print("Cost = ", cost)
 
-			if action_list is None:
-				action_list = []
-				print("creating empty list")
 
-			print("action_list = ", action_list)
-			print("cost = ", cost)
-			print("position = ", position)
+			#if action_list is None:
+			#	action_list = []
+			#	print("creating empty list")
+
+			#print("action_list = ", action_list)
+			#print("cost = ", cost)
+			#print("position = ", position)
 
 			if self.agent.isGoal((position[0], position[1])):
-				print("heeeeey")
+				print("Found goal!")
 				return position
 
 			# Add coordinate to set of explored states
@@ -776,7 +789,8 @@ class Astar(baseAlgorithm):
 				for action in actions:
 					cost_history[str(action[0])] = total_cost + self.heuristic(position, action[0])
 
-					a.put((action[0], action_list.append(action[0]), self.heuristic(position, action[0]), cost_history[str(action[0])]))
+					#a.put((action[0], action_list.append(action[0]), self.heuristic(position, action[0]), cost_history[str(action[0])]))
+					heappush(h, (cost_history[str(action[0])], (position, self.heuristic(position, action[0]))))
 
 	def getAlgType(self):
 		return "Astar"
@@ -872,7 +886,7 @@ class MinMax(baseAlgorithm):
 					#print("hunter eval = ", hunterEvalFunction(self.new_list, current_agent).evaluate())
 					#return hunterEvalFunction(self.new_list, current_agent).evaluate(worldState)
 					return worldState.hunterEval(current_agent, self.new_list)
-			
+
 			if self.new_list[current_agent].getType() is self.indexAgentType:
 				return get_max(worldState, current_depth, current_agent)
 			else:
@@ -885,11 +899,11 @@ class MinMax(baseAlgorithm):
 		#print(self.agents[self.lIndex].role ," best score = ", best_score)
 		#print("best score = ", best_score[1])
 		print ("Visited: ", self.agent_list[0].visited)
-		if best_score[1][0] not in list(self.agent_list[0].visited.keys()): 
+		if best_score[1][0] not in list(self.agent_list[0].visited.keys()):
 			self.new_list[0].visited[best_score[1][0]] = 1
 		else:
 			self.new_list[0].visited[best_score[1][0]] += 1
-		
+
 		return best_score[1]
 
 class ExpMax(baseAlgorithm):
