@@ -40,6 +40,8 @@ gameWindow = (100,100)
 class gameEngine():
 
 	def __init__(self, agentsList, wallList, newMap, safeList = [], c_agent=None, c_alg=None):
+		pygame.init()
+		self.agentsList = agentsList
 		self.wallList = wallList
 		wallGroup = pygame.sprite.Group()
 		safeGroup = pygame.sprite.Group()
@@ -61,8 +63,8 @@ class gameEngine():
 		print(gameWindow)
 		winsize= [0,0] #this is the dimensions of the onscreen window
 		#gameWindow holds the dimensions of the game map itself in 1x1 squares
-		winsize[0] = int(gameWindow[0]*2*spriteR)
-		winsize[1] = int(gameWindow[1]*2*spriteR)
+		winsize[0] = int((gameWindow[0] + 40)*2*spriteR)
+		winsize[1] = int((gameWindow[1])*2*spriteR)
 		screen = pygame.display.set_mode(winsize)
 		pygame.display.flip()
 		if newMap.getGameType() == 0:
@@ -96,6 +98,7 @@ class gameEngine():
 					if event.key == pygame.K_c:
 						updateGame = 1
 			if updateGame:
+
 				cycleLimit -=1 # only count while updating or pause breaks
 				screen.fill((0,0,0)) #this clears the screen.
 				agentGroup.update(screen) #runs agent.update() on each agent in group
@@ -103,6 +106,8 @@ class gameEngine():
 				# agents themselves should check for if tagged, etc
 				wallGroup.update(screen)
 				safeGroup.update(screen)
+				self.addText(screen)
+
 				time.sleep(0.1)#to slow it down
 				pygame.display.flip()
 				# if all runners in safe state, or all runners dead, end game
@@ -123,7 +128,6 @@ class gameEngine():
 				elif (runnerCount == 0) and (runnerSafe == 0):
 					print("Hunters won!  No remaining Runners, ",totalRunners-runnerSafe, " runners were caught")
 					gameOver = 1
-			
 
 	def validMove(self,agentPos):
 		#this function, in this case, only checks if the proposed move is
@@ -135,6 +139,54 @@ class gameEngine():
 				#print("Collision")
 				return False
 		return True
+
+	def addText(self, screen):
+		# Define colors with RGB values
+		white = (255, 255, 255)
+		green = (0, 255, 0)
+		blue = (0, 0, 128)
+		red = (245, 66, 66)
+
+		font = pygame.font.Font('freesansbold.ttf', 24)
+
+		# Runner Header
+		runnerText = font.render("Runners:", True, green, blue)
+		runnerHeader = runnerText.get_rect()
+		runnerHeader.center = ((gameWindow[0] + 10)*2*spriteR, 20)
+		screen.blit(runnerText, runnerHeader)
+
+		# Hunter Header
+		hunterText = font.render("Hunters:", True, green, blue)
+		hunterHeader = hunterText.get_rect()
+		hunterHeader.center = ((gameWindow[0] + 30)*2*spriteR, 20)
+		screen.blit(hunterText, hunterHeader)
+
+		# Add Runners
+		print("agents list = ", self.agentsList)
+		font = pygame.font.Font('freesansbold.ttf', 20)
+
+		i = 1
+		yBuffer = 45
+		for agents in self.agentsList:
+			if agents.getType() == "runner":
+				text = font.render("Runner " + str(i) + " + " + agents.getAlgName(), True, green, blue)
+				textRect = text.get_rect()
+				textRect.center = ((gameWindow[0] + 4)*2*spriteR, yBuffer)
+				i += 1
+				yBuffer += 30
+				screen.blit(text, textRect)
+
+		i = 1
+		yBuffer = 45
+		for agents in self.agentsList:
+			if agents.getType() == "hunter":
+				text = font.render("Hunter " + str(i), True, green, blue)
+				textRect = text.get_rect()
+				textRect.center = ((gameWindow[0] + 22)*2*spriteR, yBuffer)
+				i += 1
+				yBuffer += 30
+				screen.blit(text, textRect)
+
 
 class wallTile(pygame.sprite.Sprite):
 	def __init__(self,_current_pos):
@@ -157,7 +209,7 @@ class wallTile(pygame.sprite.Sprite):
 	def getPos(self):
 		return self.wallPos
 
-		
+
 class safeTile(wallTile):
 	def __init__(self,_current_pos):
 		pygame.sprite.Sprite.__init__(self)
@@ -167,6 +219,8 @@ class safeTile(wallTile):
 		self.wallPos = _current_pos
 		self.rect = pygame.Rect(self.wallPos[0]*2*spriteR,self.wallPos[1]*2*spriteR, spriteR, spriteR)
 		#rest of functionality pulled from wallTile, as other than init is identical
+
+
 
 #on run, ultimately should loop until win/loss
 #loop should iterate each agent one step, then redraw screen
@@ -179,7 +233,7 @@ if __name__ == "__main__":
 	i = random.randint(0,7)
 	chosenMap = "maps/"+maplist[i]
 	c_map = maps.Map(chosenMap, c_gameType = random.randint(0,1))#"maps/complex2.txt")
-	
+
 	for i in range(0,10):
 		r = random.randint(0,10)
 		if r == 0:
@@ -200,7 +254,7 @@ if __name__ == "__main__":
 	#agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "AStar", _role ="runner", _index = (len(agentList)), _rand=0))
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "BFS", _role ="hunter", _index = (len(agentList))))
 	agentList.append(agents.agent(c_map=c_map, c_agent_list=agentList, c_alg = "Reflex", _role ="hunter", _index = (len(agentList)), _rand = 1))
-	
+
 	wallList = [wallTile(i) for i in (c_map.get_walls()+c_map.get_map_bounds())] # Black Magic
-	safeList = [safeTile(i) for i in (c_map.get_safezone())] 
+	safeList = [safeTile(i) for i in (c_map.get_safezone())]
 	gameEngine(agentList,wallList, c_map, safeList)

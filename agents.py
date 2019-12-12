@@ -40,6 +40,7 @@ class agent(pygame.sprite.Sprite):
 		self.die = 0
 		self.teamChanged = 0
 		self.visited = {}
+		self.algorithmName = "Not Initialized"
 
 		if self.agent_pos == None:
 			if self.role == "runner":
@@ -74,46 +75,55 @@ class agent(pygame.sprite.Sprite):
 		if alg.lower() == "dfs":
 			self.algorithm = DFS(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
 			self.algorithm.setImage('./images/b4-arrow-small.png')
+			self.algorithmName = "DFS"
 		elif alg.lower() == "bfs":
 			self.algorithm = BFS(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+			self.algorithmName = "BFS"
 			if self.role == "hunter":
 				self.algorithm.setImage('./images/r1-arrow-small.png')
 			else:
 				self.algorithm.setImage('./images/b1-arrow-small.png')
 		elif alg.lower() == "astar" or alg.lower() == "A*":
 			self.algorithm = Astar(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+			self.algorithmName = "A*"
 		elif alg.lower() == "minmax":
 			self.algorithm = MinMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+			self.algorithmName = "MinMax"
 			if self.role == "hunter":
 				self.algorithm.setImage('./images/r2-arrow-small.png')
 			else:
 				self.algorithm.setImage('./images/b2-arrow-small.png')
 		elif alg.lower() == "expmax" or alg.lower() == "expectimax":
 			self.algorithm = ExpMax(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+			self.algorithmName = "ExpectiMax"
 		elif alg.lower() == "reflex":
 			self.algorithm = Reflex(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex, self.rand)
+			self.algorithmName = "Reflex"
 			if self.role == "hunter":
 				self.algorithm.setImage('./images/r3-arrow-small.png')
 			else:
 				self.algorithm.setImage('./images/b3-arrow-small.png')
 		elif alg.lower() == "test":
 			self.algorithm = testAlgorithm(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
+			self.algorithmName = "Test"
 		elif alg.lower() == "testmm":
 			self.algorithm = testMM(self.agent_pos, self.c_map,self.c_agent_list, self.lIndex)
-
+			self.algorithmName = "TestMM"
 		else:
 			print("Using generic algorithms.")
 			self.algorithm = genericAlgorithms(self.agent_pos, self.c_map, self.c_agent_list, self.lIndex)
+			self.algorithmName = "GA"
+
 		# Assign Image
 		print("Role: ", self.role)
 		#print(self.algorithm.getImage())
-		
+
 		self.image = pygame.image.load(self.algorithm.getImage())
 		self.sScale = .5
 		self.spriteR = 20 * self.sScale
 		self.image = pygame.transform.scale(self.image, (int(self.spriteR * 2), int(self.spriteR * 2)))
-			
-			
+
+
 
 	def update(self, screen):
 		'''
@@ -128,16 +138,16 @@ class agent(pygame.sprite.Sprite):
 			# the move list and reset teamChanged in case it changes back
 			self.com_mag = None
 			self.teamChanged = 0
-
+			
 		if not self.com_mag:
 			#print("self.agentpos",self.agent_pos)
 			# Algorithm time tracker
 			alg_start_time = datetime.now()
-			
+
 			move_result = self.algorithm.move(self.agent_pos)
-			
+
 			alg_end_time = datetime.now() - alg_start_time
-			
+
 			#print("Move result: ", move_result)
 
 			# kill or convert.  for now, kills on hunter tagging a runner
@@ -258,3 +268,6 @@ class agent(pygame.sprite.Sprite):
 
 	def getAlg(self):
 		return self.algorithm
+
+	def getAlgName(self):
+		return self.algorithmName
